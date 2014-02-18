@@ -1,0 +1,5 @@
+<h3>Book controller:</h3>
+
+<div id='container'>
+	loading book (<%= @code %>) ... <%= @bidAsk %>
+</div> 

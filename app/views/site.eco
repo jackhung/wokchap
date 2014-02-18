@@ -1,0 +1,9 @@
+<div id='page-header'>
+	Header
+</div>
+<div id="page-container">
+	loading page ... 
+</div>
+<div id="page-footer">
+	Footer
+</div>

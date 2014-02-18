@@ -10,7 +10,9 @@
     "console-polyfill": "~0.1.1",
     "lesshat": "~2.0.12",
     "jquery": "~2.1.0",
-    "lodash": "~2.4.1"
+    "lodash": "~2.4.1",
+    "rivets": "~0.6.4",
+    "moment": "2.5.1"
   },
   "overrides": {
     "backbone": {
@@ -19,6 +21,12 @@
         "jquery": "*"
       },
       "main": "backbone.js"
+    },
+    "rivets": {
+      "main": "dist/rivets.js"
+    },
+    "moment": {
+      "main": "moment.js"
     }
   }
 }
