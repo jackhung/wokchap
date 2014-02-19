@@ -22,6 +22,9 @@
       },
       "main": "backbone.js"
     },
+    "jquery": {
+      "main": "dist/jquery.js"
+    },
     "rivets": {
       "main": "dist/rivets.js"
     },

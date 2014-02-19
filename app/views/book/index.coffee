@@ -9,3 +9,6 @@ module.exports = class BookView extends View
 
   initialize: ->
     console.log "BookView#initialize ... #{@model.code}"
+
+  listen: 
+    "change model" : "render"

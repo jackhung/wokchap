@@ -17,5 +17,5 @@ module.exports = class BookController extends Controller
 
     # rivets.bind(@view.$el,{book: @model})
     @model.fetch().then =>
-      @view.render()
-      console.log "book#show done: #{@view.$el}"
+      # @view.render()
+      console.log "book#show done:", @model.attributes
