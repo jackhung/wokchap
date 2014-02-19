@@ -12,9 +12,10 @@ module.exports = class BookController extends Controller
     console.log "BookController#initialize ... reuse site"
 
   show: (params) ->
-    @model = new Book(code: '00175')
-    @model.fetch()
-    @view = new BooksView( model: @model )
+    @model = new Book(code: params.code)
+    @view = new BooksView( model: @model, autoRender: false, containerMethod: "html" )
 
-    # rivets.bind(@view.$el,{book: @model});
-    console.log "book#show done: #{@view.$el}"
+    # rivets.bind(@view.$el,{book: @model})
+    @model.fetch().then =>
+      @view.render()
+      console.log "book#show done: #{@view.$el}"

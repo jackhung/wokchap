@@ -1,5 +1,14 @@
 <h3>Book controller:</h3>
 
 <div id='container'>
-	loading book (<%= @code %>) ... <%= @bidAsk %>
+	Book <%= @name %> (<%= @code %>)
+	<p>
+		<%= "#{@quote.date} #{@quote.time}" %> 
+		<%= "#{@quote.bid} #{@quote.ask}" %>
+	<p>
+		<%= @quote.open %> 
+		<%= @quote.high %>
+		<%= @quote.low %>
+		<%= @quote.close %>
+		<%= @quote.volume %>
 </div> 

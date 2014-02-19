@@ -2,4 +2,4 @@
 
 module.exports = (match) ->
   match '', 'app#index'
-  match 'book/:id', 'book#show'
+  match 'book/:code', 'book#show'
