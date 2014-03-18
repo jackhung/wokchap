@@ -11,3 +11,4 @@ module.exports = class SiteView extends View
 
   initialize: ->
     console.log "SiteView@initialize"
+    super

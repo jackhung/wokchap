@@ -4,9 +4,11 @@ Controller = require('controllers/base/controller')
 
 News = require 'models/news'
 NewsList = require 'models/news_list'
+Pager = require 'models/pager'
 
 NewsView = require('views/news/item')
 NewsListView = require 'views/news/list'
+# PagerView = require 'views/news/pager'
 
 SiteView = require "views/site-view"
 
@@ -17,11 +19,15 @@ module.exports = class NewsController extends Controller
     console.log "NewsController#initialize ... reuse site"
 
   list: () ->
+    @pager = new Pager()
     @collection = new NewsList()
-    @view = new NewsListView( collection: @collection, model: @collection.pageInfo)
+    @collection.pager = @pager
+    # @pageView = new PagerView(model: @pager)
+
+    @view = new NewsListView( collection: @collection)
     @collection.fetch().then =>
       console.log "news list fetched"
-      @view.render()
+      # @view.render()
 
   show: (params) ->
     @model = new News(code: params.code)

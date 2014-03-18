@@ -1,8 +1,11 @@
 
-<div id='container'>
-	<ol id='news-list'>
-	</ol>	
-	<div id='pagination'>
-		Pagination ... <%= @pageInfo %>
+<div id='news-container'>
+	<div id="news-list-container">
+		<ol id='news-list'>
+		</ol>
 	</div>
+
 </div> 
+<div id='pagination-container'>
+	Pagination ... 
+</div>

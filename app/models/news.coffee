@@ -8,7 +8,7 @@ module.exports = class News extends Model
     "http://dev.wokwin.com:9080/finNews/${id}"
 
   parse: (data) =>
-    console.log data.title
+    # console.log data.title
     data
     # super.parse data
     # if response.status is "ok"

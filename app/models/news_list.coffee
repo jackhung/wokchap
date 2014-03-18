@@ -9,6 +9,7 @@ module.exports = class NewsList extends Collection
     "http://dev.wokwin.com:9080/finNews"
 
   parse: (response) ->
-    @pageInfo = response.pageMeta
-    console.log "NewsList parse status: #{response.status}, offset: #{@pageInfo.offset}"
+    # console.log "========= #{@pager}"
+    @pager.set response.pageMeta
+    console.log "NewsList parse status: #{response.status}, offset: #{@pager.get('offset')}"
     return response.result;
