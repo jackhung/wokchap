@@ -1,14 +1,13 @@
 <h3>Book controller:</h3>
 
 <div id='container'>
-	Book <%= @name %> (<%= @code %>)
+	Quote: <%= @cName %> (<%= @code %>)
 	<p>
-		<%= "#{@quote.date} #{@quote.time}" %> 
-		<%= "#{@quote.bid} #{@quote.ask}" %>
+		<%= "#{@bid} #{@ask}" %>
 	<p>
-		<%= @quote.open %> 
-		<%= @quote.high %>
-		<%= @quote.low %>
-		<%= @quote.close %>
-		<%= @quote.volume %>
+		<%= @open %> 
+		<%= @high %>
+		<%= @low %>
+		<%= @close %>
+		<%= @volume %>
 </div> 

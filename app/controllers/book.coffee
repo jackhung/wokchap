@@ -19,3 +19,6 @@ module.exports = class BookController extends Controller
     @model.fetch().then =>
       # @view.render()
       console.log "book#show done:", @model.attributes
+      setInterval =>
+          @model.fetch()  #self.emit 'tick'
+        , 5000

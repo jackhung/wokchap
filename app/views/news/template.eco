@@ -1,0 +1,8 @@
+
+<div id='container'>
+	<ol id='news-list'>
+	</ol>	
+	<div id='pagination'>
+		Pagination ... <%= @pageInfo %>
+	</div>
+</div> 
