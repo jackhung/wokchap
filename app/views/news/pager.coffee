@@ -13,6 +13,7 @@ module.exports = class PagerView extends View
     "change model" : "render"
 
   render: () ->
+    return if not @model.isReady()
     super
     
     html = @template(@model.attributes)

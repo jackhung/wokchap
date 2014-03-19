@@ -8,7 +8,7 @@ module.exports = class NewsView extends View
   template: require('./template')
 
   initialize: ->
-    console.log "NewsView#initialize ... #{@model.get('title')}"
+    console.debug "NewsView#initialize ...", @model
 
   listen: 
     "change model" : "render"

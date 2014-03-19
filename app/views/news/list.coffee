@@ -23,9 +23,13 @@ module.exports = class NewsListView extends CollectionView
   listen: 
     "change collection" : "render"
 
-  initItemView: (model) =>
-    console.log "NewsListView#initItemView ... #{model.get('title')}"
-    new NewsView model: model
+  initItemView: (item) =>
+    console.log "NewsListView#initItemView ... #{item.get('title')}"
+    new NewsView model: item
+
+  # getView: (item) ->
+  #   # Instantiate an item view
+  #   new NewsView model: item
 
   render: ->
     super
