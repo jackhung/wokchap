@@ -18,7 +18,7 @@ module.exports = class NewsController extends Controller
     @reuse 'site', SiteView
     console.log "NewsController#initialize ... reuse site"
 
-  list: () ->
+  list: (params, route) ->
     @pager = new Pager()
     @collection = new NewsList()
     @collection.pager = @pager
@@ -29,8 +29,8 @@ module.exports = class NewsController extends Controller
       console.log "news list fetched"
       # @view.render()
 
-  show: (params) ->
-    @model = new News(code: params.code)
+  show: (params, route) ->
+    @model = new News(link: params.link)
     @view = new BooksView( model: @model, autoRender: false, containerMethod: "html" )
 
     # rivets.bind(@view.$el,{book: @model})

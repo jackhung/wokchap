@@ -6,7 +6,7 @@ PagerView = require "views/news/pager"
 
 module.exports = class NewsListView extends CollectionView
   className: 'news-view'
-  container: '#page-container'
+  container: '#content-container'
   listSelector: "#news-list-container"
   containerMethod: "html"
   template: require('./template')

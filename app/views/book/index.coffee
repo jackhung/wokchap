@@ -4,7 +4,7 @@ View = require('views/base/view')
 
 module.exports = class BookView extends View
   className: 'book-view'
-  container: '#page-container'
+  container: '#content-container'
   template: require('./template')
 
   initialize: ->
