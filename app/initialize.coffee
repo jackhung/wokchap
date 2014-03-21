@@ -17,9 +17,20 @@ initialize = ->
     publish: (obj, keypath, value) ->
       obj.set(keypath, value)
 
+  # handle contextPath (hack for integrating with backend)
+  config = require 'config'
+
   # Start application
   App = require('app')
-  window.CHAP_APP = new App
+
+  # adjust context path for the Application (hack for backend integrated deployment)
+  rpath = config.contextRoot
+  matchContext = new RegExp("^#{rpath}/|^#{rpath}$")
+  window.CHAP_APP = if matchContext.test(location.pathname)
+      new App
+       root: config.contextRoot
+    else
+      new App
 
 # Initialize the application on DOM ready event.
 # Use jQuery if available. Otherwise use native.

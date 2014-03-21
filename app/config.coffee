@@ -7,6 +7,8 @@ config.api.root = if local
 else
   'http://test01-wokwin.rhcloud.com'
 
+config.contextRoot = "/app"
+
 config.api.versionRoot = config.api.root + '/v1'
 
 module.exports = config

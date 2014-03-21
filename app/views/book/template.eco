@@ -2,12 +2,11 @@
 
 <div id='container'>
 	Quote: <%= @cName %> (<%= @code %>)
-	<p>
-		<%= "#{@bid} #{@ask}" %>
+		<strong><%= "#{@ask} #{@bid}" %></strong>
 	<p>
 		<%= @open %> 
 		<%= @high %>
 		<%= @low %>
-		<%= @close %>
+		<strong><%= @close %></strong>
 		<%= @volume %>
 </div> 

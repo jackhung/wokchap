@@ -1,4 +1,4 @@
 
 <div id='container'>
-	News: <%= @title %> (<%= @author %>)
+	News: <%= @title %> (<%= @author %>) <%= moment(@date).format("YYYY-MM-DD") %>
 </div> 
