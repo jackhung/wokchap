@@ -1,12 +1,15 @@
 <h3>Book controller:</h3>
 
-<div id='container'>
+<div id='quote-content' code='<%= @code %>' >
 	Quote: <%= @cName %> (<%= @code %>)
-		<strong><%= "#{@ask} #{@bid}" %></strong>
+		<strong>
+		<span class="quote-price"><%= @ask %></span>,
+		<span class="quote-price"><%= @bid %></strong></span">
+		</strong>
 	<p>
-		<%= @open %> 
-		<%= @high %>
-		<%= @low %>
-		<strong><%= @close %></strong>
-		<%= @volume %>
+		<span class="quote-price"><%= @open %></span> 
+		<span class="quote-price"><%= @high %></span>
+		<span class="quote-price"><%= @low %></span>
+		<span class="quote-price"><strong><%= @close %></strong></span>
+		<span class="quote-price"><%= @volume %></span>
 </div> 
