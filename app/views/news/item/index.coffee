@@ -13,3 +13,11 @@ module.exports = class NewsView extends View
 
   listen: 
     "change model" : "render"
+    "mouseover .stock-tip" : 'showTip'
+
+  showTip: (e) ->
+    console.debug $(e.target).attr("ref")
+
+  render: ->
+    super
+    @delegate "mouseover", ".stock-tip", @showTip

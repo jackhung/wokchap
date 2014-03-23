@@ -29,7 +29,11 @@ module.exports = class PagerView extends View
     pStart = Math.floor(currentPage - (@pagerSize / 2))
     pStart = 0 if pStart < 0
     pEnd = pStart + @pagerSize
-    pEnd = totalPages if pEnd >= totalPages
+    if pEnd >= totalPages
+      pEnd = totalPages
+      s = Math.floor(pEnd - (@pagerSize / 2))
+      if s >=0 and s < pStart
+        pStart = s
 
     pages = for n in [pStart ... pEnd]
       o = n * max
