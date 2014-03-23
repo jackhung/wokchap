@@ -1,8 +1,6 @@
 
 <div id='news-container'>
-	<div id="news-list-container">
-		<ol id='news-list'>
-		</ol>
+	<div id="news-list-container" class="fluid-container">
 	</div>
 
 </div> 

@@ -1,6 +1,7 @@
 'use strict'
 
 Controller = require('controllers/base/controller')
+utils = require 'lib/utils'
 
 News = require 'models/news'
 NewsList = require 'models/news_list'
@@ -17,12 +18,15 @@ module.exports = class NewsController extends Controller
   initialize: ->
     @reuse 'site', SiteView
     console.log "NewsController#initialize ... reuse site"
+    @pager = new Pager()
 
   list: (params, route) ->
-    @pager = new Pager()
     @collection = new NewsList()
     @collection.pager = @pager
     # @pageView = new PagerView(model: @pager)
+    query = utils.queryParams.parse(route.query)
+    @pager.set("offset", query.offset) if query.offset
+    @pager.set("max", query.max) if query.max
 
     @view = new NewsListView( collection: @collection)
     @collection.fetch().then =>

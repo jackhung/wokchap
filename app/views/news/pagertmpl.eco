@@ -1,1 +1,16 @@
-<div>The pager goes here offset: <%= @offset %></div>
+<div>The pager goes here offset: <%= @offset %>, <%= @totalPages %></div>
+<ul class="pagination">
+  <li><a class="page-first" href="#">Previous</a></li>
+  <li><a class="page-previous" href="#">1 ...</a></li>
+  <li><a class="page-n" href="#">1</a></li>
+  <li><a class="page-n" href="#">2</a></li>
+  <li><a class="page-n" href="#">3</a></li>
+  <li><a class="page-n" href="#">4</a></li>
+  <li><a class="page-n" href="#">5</a></li>
+  <li><a class="page-n" href="#">6</a></li>
+  <li><a class="page-n" href="#">7</a></li>
+  <li><a class="page-n" href="#">8</a></li>
+  <li><a class="page-n" href="#">9</a></li>
+  <li><a class="page-next" href="#">... <%= @totalPages %></a></li>
+  <li><a class="page-last" href="#">Next</a></li>
+</ul>
