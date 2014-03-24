@@ -1,11 +1,12 @@
 'use strict'
 
 Model = require('models/base/model')
+config = require "config"
 
 module.exports = class News extends Model
-  idAttribute: "link"
+  # idAttribute: "link"
   url: ->
-    "http://dev.wokwin.com:9080/finNews/${id}"
+    "#{config.api.root}/finNews/#{@id}"
 
   parse: (data) =>
     # console.log data.title

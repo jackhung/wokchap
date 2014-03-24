@@ -2,11 +2,12 @@
 
 Collection = require('models/base/collection')
 News = require('./news')
+config = require "config"
 
 module.exports = class NewsList extends Collection
   model: News
   url: ->
-    "http://dev.wokwin.com:9080/finNews?#{@pagerParams()}"
+    "#{config.api.root}/finNews?#{@pagerParams()}"
 
   parse: (response) ->
     # console.log "========= #{@pager}"

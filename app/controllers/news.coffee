@@ -7,7 +7,7 @@ News = require 'models/news'
 NewsList = require 'models/news_list'
 Pager = require 'models/pager'
 
-NewsView = require('views/news/item')
+NewsShowView = require('views/news/item/news-show')
 NewsListView = require 'views/news/list'
 # PagerView = require 'views/news/pager'
 
@@ -34,13 +34,11 @@ module.exports = class NewsController extends Controller
       # @view.render()
 
   show: (params, route) ->
-    @model = new News(link: params.link)
-    @view = new BooksView( model: @model, autoRender: false, containerMethod: "html" )
+    console.debug "news#show", params
+    @model = new News(id: params.id)
+    @view = new NewsShowView( model: @model, autoRender: false, containerMethod: "html" )
 
     # rivets.bind(@view.$el,{book: @model})
     @model.fetch().then =>
       # @view.render()
-      console.log "book#show done:", @model.attributes
-      setInterval =>
-          @model.fetch()  #self.emit 'tick'
-        , 5000
+      console.log "news#show done:", @model.attributes

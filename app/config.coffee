@@ -1,11 +1,14 @@
 config = {api: {}}
 
-local = true
+cloudhosts = ["rhcloud.com"]
+host = window.location.hostname
 
-config.api.root = if local
-  'http://dev.wokwin.com:9080'
+cloudDeploy = _.find(cloudhosts, (n) -> host.indexOf(n) > 1 )
+
+config.api.root = if cloudDeploy
+  "http://${host}"
 else
-  'http://test01-wokwin.rhcloud.com'
+  'http://dev.wokwin.com:9080'
 
 config.contextRoot = "/app"
 
