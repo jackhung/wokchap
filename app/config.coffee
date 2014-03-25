@@ -3,10 +3,12 @@ config = {api: {}}
 cloudhosts = ["rhcloud.com"]
 host = window.location.hostname
 
-cloudDeploy = _.find(cloudhosts, (n) -> host.indexOf(n) > 1 )
+cloudDeploy = _.find(cloudhosts, (n) -> host.indexOf(n) > 0 )
+
+console.log "Cloud Deployed? #{cloudDeploy}"
 
 config.api.root = if cloudDeploy
-  "http://${host}"
+  "http://#{host}"
 else
   'http://dev.wokwin.com:9080'
 
