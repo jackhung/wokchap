@@ -23,6 +23,6 @@ module.exports = class NewsShowView extends View
     @$el.find(".stock-ref").each (ref) ->
       $this = $(@)
       code = $this.attr("ref")
-      $(" <span class='glyphicon glyphicon-eye-open stock-tip' ref='#{code}'></span> ").insertAfter($this)
+      $(" <i class='cus-chart-line stock-tip' ref='#{code}'></i> ").insertAfter($this)
       console.debug $this.attr("ref")
     @initTip()

@@ -9,7 +9,7 @@
 	        <span class="icon-bar"></span>
 	        <span class="icon-bar"></span>
 	      </button>
-	      <a class="navbar-brand" href="#">HotWok</a>
+	      <a class="navbar-brand" href="#"><i class="cus-application-home"></i> HotWok</a>
 	    </div>
 
 	    <!-- Collect the nav links, forms, and other content for toggling -->

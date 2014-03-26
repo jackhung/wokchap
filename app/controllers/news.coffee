@@ -16,6 +16,7 @@ SiteView = require "views/site-view"
 module.exports = class NewsController extends Controller
 
   initialize: ->
+    super
     @reuse 'site', SiteView
     console.log "NewsController#initialize ... reuse site"
     @pager = new Pager()
