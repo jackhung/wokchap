@@ -156,12 +156,12 @@ module.exports = class SimpleGraph
       return "translate(0," + self.y(d) + ")"
     stroke = (d) ->
       return if d then "#ccc" else "#666"
-    fx = self.x.tickFormat(10)
-    fy = self.y.tickFormat(10)
+    fx = @x.tickFormat(10)
+    fy = @y.tickFormat(10)
 
     # Regenerate x-ticks…
-    gx = self.vis.selectAll("g.x")
-        .data(self.x.ticks(10), String)
+    gx = @vis.selectAll("g.x")
+        .data(@x.ticks(10), String)
         .attr("transform", tx)
 
     gx.select("text")
@@ -174,25 +174,25 @@ module.exports = class SimpleGraph
     gxe.append("line")
         .attr("stroke", stroke)
         .attr("y1", 0)
-        .attr("y2", self.size.height)
+        .attr("y2", @size.height)
 
     gxe.append("text")
         .attr("class", "axis")
-        .attr("y", self.size.height)
+        .attr("y", @size.height)
         .attr("dy", "1em")
         .attr("text-anchor", "middle")
         .text(fx)
         .style("cursor", "ew-resize")
         .on("mouseover", (d) -> d3.select(this).style("font-weight", "bold"))
         .on("mouseout",  (d) -> d3.select(this).style("font-weight", "normal"))
-        .on("mousedown.drag",  self.xaxis_drag)
-        .on("touchstart.drag", self.xaxis_drag);
+        .on("mousedown.drag",  @xaxis_drag)
+        .on("touchstart.drag", @xaxis_drag);
 
     gx.exit().remove();
 
     # Regenerate y-ticks…
-    gy = self.vis.selectAll("g.y")
-        .data(self.y.ticks(10), String)
+    gy = @vis.selectAll("g.y")
+        .data(@y.ticks(10), String)
         .attr("transform", ty)
 
     gy.select("text")
@@ -206,7 +206,7 @@ module.exports = class SimpleGraph
     gye.append("line")
         .attr("stroke", stroke)
         .attr("x1", 0)
-        .attr("x2", self.size.width)
+        .attr("x2", @size.width)
 
     gye.append("text")
         .attr("class", "axis")
@@ -217,12 +217,12 @@ module.exports = class SimpleGraph
         .style("cursor", "ns-resize")
         .on("mouseover", (d) -> d3.select(this).style("font-weight", "bold"))
         .on("mouseout",  (d) -> d3.select(this).style("font-weight", "normal"))
-        .on("mousedown.drag",  self.yaxis_drag)
-        .on("touchstart.drag", self.yaxis_drag)
+        .on("mousedown.drag",  @yaxis_drag)
+        .on("touchstart.drag", @yaxis_drag)
 
     gy.exit().remove();
-    self.plot.call(d3.behavior.zoom().x(self.x).y(self.y).on("zoom", self.redraw));
-    self.update();    
+    @plot.call(d3.behavior.zoom().x(@x).y(@y).on("zoom", @redraw));
+    @update();    
 
   update: () =>
     lines = @vis.select("path").attr("d", @line(@points));
