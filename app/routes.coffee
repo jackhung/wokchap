@@ -9,5 +9,6 @@ module.exports = (match) ->
 
   match '', 'app#index'
   match 'book/:code', 'book#show'
+  match 'chart/:code', 'chart#show'
   match 'news', 'news#list'
   match 'news/:id', 'news#show'
