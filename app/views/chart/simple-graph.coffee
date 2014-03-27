@@ -80,7 +80,7 @@ module.exports = class SimpleGraph
         .attr("pointer-events", "all")
         .on("mousedown.drag", @plot_drag)
         .on("touchstart.drag", @plot_drag)
-        @plot.call(d3.behavior.zoom().x(@x).y(@y).on("zoom", @redraw()))
+        @plot.call(d3.behavior.zoom().x(@x).y(@y).on("zoom", @redraw))
 
     @vis.append("svg")
         .attr("top", 0)
@@ -119,19 +119,17 @@ module.exports = class SimpleGraph
           .text(@options.ylabel)
           .style("text-anchor","middle")
           .attr("transform","translate(" + -40 + " " + @size.height/2+") rotate(-90)");
-    
 
     d3.select(@chart)
-        .on("mousemove.drag", self.mousemove())
-        .on("touchmove.drag", self.mousemove())
-        .on("mouseup.drag",   self.mouseup())
-        .on("touchend.drag",  self.mouseup());
+        .on("mousemove.drag", self.mousemove)
+        .on("touchmove.drag", self.mousemove)
+        .on("mouseup.drag",   self.mouseup)
+        .on("touchend.drag",  self.mouseup)
 
-    @redraw()();
-
+    @redraw()
 
   plot_drag: () =>
-    registerKeyboardHandler(@keydown())
+    registerKeyboardHandler(@keydown)
     d3.select('body').style("cursor", "move")
     if (d3.event.altKey) 
       p = d3.mouse(@vis.node())
@@ -139,11 +137,10 @@ module.exports = class SimpleGraph
       newpoint.x = @x.invert(Math.max(0, Math.min(@size.width,  p[0])));
       newpoint.y = @y.invert(Math.max(0, Math.min(@size.height, p[1])));
       @points.push(newpoint);
-      @points.sort( (a, b) ->
+      @points.sort (a, b) ->
         return -1 if a.x < b.x
         return  1 if a.x > b.x
         return 0
-      )
       @selected = newpoint
       @update()
       d3.event.preventDefault()
@@ -152,103 +149,100 @@ module.exports = class SimpleGraph
   redraw: () =>
     console.log "REDRAWing"
     self = this;
-    return () ->
-      tx = (d) ->
-        return "translate(" + self.x(d) + ",0)"
-      ty = (d) ->
-        return "translate(0," + self.y(d) + ")"
-      stroke = (d) ->
-        return if d then "#ccc" else "#666"
-      fx = self.x.tickFormat(10)
-      fy = self.y.tickFormat(10)
+    # return () ->
+    tx = (d) ->
+      return "translate(" + self.x(d) + ",0)"
+    ty = (d) ->
+      return "translate(0," + self.y(d) + ")"
+    stroke = (d) ->
+      return if d then "#ccc" else "#666"
+    fx = self.x.tickFormat(10)
+    fy = self.y.tickFormat(10)
 
-      # Regenerate x-ticks…
-      gx = self.vis.selectAll("g.x")
-          .data(self.x.ticks(10), String)
-          .attr("transform", tx)
+    # Regenerate x-ticks…
+    gx = self.vis.selectAll("g.x")
+        .data(self.x.ticks(10), String)
+        .attr("transform", tx)
 
-      gx.select("text")
-          .text(fx)
+    gx.select("text")
+        .text(fx)
 
-      gxe = gx.enter().insert("g", "a")
-          .attr("class", "x")
-          .attr("transform", tx)
+    gxe = gx.enter().insert("g", "a")
+        .attr("class", "x")
+        .attr("transform", tx)
 
-      gxe.append("line")
-          .attr("stroke", stroke)
-          .attr("y1", 0)
-          .attr("y2", self.size.height)
+    gxe.append("line")
+        .attr("stroke", stroke)
+        .attr("y1", 0)
+        .attr("y2", self.size.height)
 
-      gxe.append("text")
-          .attr("class", "axis")
-          .attr("y", self.size.height)
-          .attr("dy", "1em")
-          .attr("text-anchor", "middle")
-          .text(fx)
-          .style("cursor", "ew-resize")
-          .on("mouseover", (d) -> d3.select(this).style("font-weight", "bold"))
-          .on("mouseout",  (d) -> d3.select(this).style("font-weight", "normal"))
-          .on("mousedown.drag",  self.xaxis_drag())
-          .on("touchstart.drag", self.xaxis_drag());
+    gxe.append("text")
+        .attr("class", "axis")
+        .attr("y", self.size.height)
+        .attr("dy", "1em")
+        .attr("text-anchor", "middle")
+        .text(fx)
+        .style("cursor", "ew-resize")
+        .on("mouseover", (d) -> d3.select(this).style("font-weight", "bold"))
+        .on("mouseout",  (d) -> d3.select(this).style("font-weight", "normal"))
+        .on("mousedown.drag",  self.xaxis_drag)
+        .on("touchstart.drag", self.xaxis_drag);
 
-      gx.exit().remove();
+    gx.exit().remove();
 
-      # Regenerate y-ticks…
-      gy = self.vis.selectAll("g.y")
-          .data(self.y.ticks(10), String)
-          .attr("transform", ty)
+    # Regenerate y-ticks…
+    gy = self.vis.selectAll("g.y")
+        .data(self.y.ticks(10), String)
+        .attr("transform", ty)
 
-      gy.select("text")
-          .text(fy);
+    gy.select("text")
+        .text(fy);
 
-      gye = gy.enter().insert("g", "a")
-          .attr("class", "y")
-          .attr("transform", ty)
-          .attr("background-fill", "#FFEEB6")
+    gye = gy.enter().insert("g", "a")
+        .attr("class", "y")
+        .attr("transform", ty)
+        .attr("background-fill", "#FFEEB6")
 
-      gye.append("line")
-          .attr("stroke", stroke)
-          .attr("x1", 0)
-          .attr("x2", self.size.width)
+    gye.append("line")
+        .attr("stroke", stroke)
+        .attr("x1", 0)
+        .attr("x2", self.size.width)
 
-      gye.append("text")
-          .attr("class", "axis")
-          .attr("x", -3)
-          .attr("dy", ".35em")
-          .attr("text-anchor", "end")
-          .text(fy)
-          .style("cursor", "ns-resize")
-          .on("mouseover", (d) -> d3.select(this).style("font-weight", "bold"))
-          .on("mouseout",  (d) -> d3.select(this).style("font-weight", "normal"))
-          .on("mousedown.drag",  self.yaxis_drag())
-          .on("touchstart.drag", self.yaxis_drag())
+    gye.append("text")
+        .attr("class", "axis")
+        .attr("x", -3)
+        .attr("dy", ".35em")
+        .attr("text-anchor", "end")
+        .text(fy)
+        .style("cursor", "ns-resize")
+        .on("mouseover", (d) -> d3.select(this).style("font-weight", "bold"))
+        .on("mouseout",  (d) -> d3.select(this).style("font-weight", "normal"))
+        .on("mousedown.drag",  self.yaxis_drag)
+        .on("touchstart.drag", self.yaxis_drag)
 
-      gy.exit().remove();
-      self.plot.call(d3.behavior.zoom().x(self.x).y(self.y).on("zoom", self.redraw()));
-      self.update();    
+    gy.exit().remove();
+    self.plot.call(d3.behavior.zoom().x(self.x).y(self.y).on("zoom", self.redraw));
+    self.update();    
 
-
-
-  update: () ->
-    self = this;
-    lines = this.vis.select("path").attr("d", this.line(this.points));
+  update: () =>
+    lines = @vis.select("path").attr("d", @line(@points));
           
-    circle = this.vis.select("svg").selectAll("circle")
-        .data(this.points, (d) -> return d)
+    circle = @vis.select("svg").selectAll("circle")
+        .data(@points, (d) -> return d)
 
     circle.enter().append("circle")
-        .attr("class", (d) -> if d is self.selected then "selected" else null )
-        .attr("cx",    (d) -> return self.x(d.x); )
-        .attr("cy",    (d) -> return self.y(d.y); )
+        .attr("class", (d) => if d is @selected then "selected" else null )
+        .attr("cx",    (d) => @x(d.x) )
+        .attr("cy",    (d) => @y(d.y) )
         .attr("r", 10.0)
         .style("cursor", "ns-resize")
-        .on("mousedown.drag",  self.datapoint_drag())
-        .on("touchstart.drag", self.datapoint_drag());
+        .on("mousedown.drag",  @datapoint_drag)
+        .on("touchstart.drag", @datapoint_drag);
 
     circle
-        .attr("class", (d) -> if d is self.selected then "selected" else null )
-        .attr("cx",    (d) -> return self.x(d.x); )
-        .attr("cy",    (d) -> return self.y(d.y); )
+        .attr("class", (d) => if d is @selected then "selected" else null )
+        .attr("cx",    (d) => @x(d.x) )
+        .attr("cy",    (d) => @y(d.y) )
 
     circle.exit().remove();
 
@@ -256,104 +250,92 @@ module.exports = class SimpleGraph
       d3.event.preventDefault();
       d3.event.stopPropagation()
 
-  datapoint_drag: () ->
-    self = this;
-    return (d) ->
-      registerKeyboardHandler(self.keydown());
-      document.onselectstart = () -> return false
-      self.selected = self.dragged = d
-      self.update()
+  datapoint_drag: (d) =>
+    registerKeyboardHandler(@keydown);
+    document.onselectstart = () -> return false
+    @selected = @dragged = d
+    @update()
 
-  mousemove: () ->
-    self = this
-    return () ->
-      p = d3.mouse(self.vis[0][0])
-      t = d3.event.changedTouches
-      
-      if (self.dragged)
-        self.dragged.y = self.y.invert(Math.max(0, Math.min(self.size.height, p[1])));
-        self.update();
-      
-      if (!isNaN(self.downx)) 
-        d3.select('body').style("cursor", "ew-resize");
-        rupx = self.x.invert(p[0])
-        xaxis1 = self.x.domain()[0]
-        xaxis2 = self.x.domain()[1]
-        xextent = xaxis2 - xaxis1
-        if (rupx != 0)
-
-          changex = self.downx / rupx;
-          new_domain = [xaxis1, xaxis1 + (xextent * changex)];
-          self.x.domain(new_domain);
-          self.redraw()();
+  mousemove: () =>
+    p = d3.mouse(@vis[0][0])
+    t = d3.event.changedTouches
     
-        d3.event.preventDefault();
-        d3.event.stopPropagation();
+    if (@dragged)
+      @dragged.y = @y.invert(Math.max(0, Math.min(@size.height, p[1])));
+      @update();
+    
+    if (!isNaN(@downx)) 
+      d3.select('body').style("cursor", "ew-resize");
+      rupx = @x.invert(p[0])
+      xaxis1 = @x.domain()[0]
+      xaxis2 = @x.domain()[1]
+      xextent = xaxis2 - xaxis1
+      if (rupx != 0)
+
+        changex = @downx / rupx;
+        new_domain = [xaxis1, xaxis1 + (xextent * changex)];
+        @x.domain(new_domain);
+        @redraw();
+  
+      d3.event.preventDefault();
+      d3.event.stopPropagation();
+    
+    if (!isNaN(@downy)) 
+      d3.select('body').style("cursor", "ns-resize");
+      rupy = @y.invert(p[1])
+      yaxis1 = @y.domain()[1]
+      yaxis2 = @y.domain()[0]
+      yextent = yaxis2 - yaxis1
+      if (rupy != 0) 
+        changey = @downy / rupy;
+        new_domain = [yaxis1 + (yextent * changey), yaxis1];
+        @y.domain(new_domain);
+        @redraw();
       
-      if (!isNaN(self.downy)) 
-        d3.select('body').style("cursor", "ns-resize");
-        rupy = self.y.invert(p[1])
-        yaxis1 = self.y.domain()[1]
-        yaxis2 = self.y.domain()[0]
-        yextent = yaxis2 - yaxis1
-        if (rupy != 0) 
-          changey = self.downy / rupy;
-          new_domain = [yaxis1 + (yextent * changey), yaxis1];
-          self.y.domain(new_domain);
-          self.redraw()();
+      d3.event.preventDefault();
+      d3.event.stopPropagation();
+
+  mouseup: () =>
+    document.onselectstart = () -> return true
+    d3.select('body').style("cursor", "auto");
+    d3.select('body').style("cursor", "auto");
+    if (!isNaN(@downx))
+      @redraw();
+      @downx = Math.NaN;
+      d3.event.preventDefault();
+      d3.event.stopPropagation();
+
+    if (!isNaN(@downy)) 
+      @redraw();
+      @downy = Math.NaN;
+      d3.event.preventDefault();
+      d3.event.stopPropagation();
+
+    if (@dragged) 
+      @dragged = null 
+
+  keydown: () =>
+    return if not @selected
+    switch (d3.event.keyCode)
+      when 8, 46   # delete
+        i = @points.indexOf(@selected)
+        @points.splice(i, 1);
+        # self.selected = self.points.length ? self.points[i > 0 ? i - 1 : 0] : null;
+        @selected = if @points.length
+          if i > 0 then @points[i - 1] else @points[0]
+        else
+          null
+        @update();
         
-        d3.event.preventDefault();
-        d3.event.stopPropagation();
+  xaxis_drag: () =>
+    document.onselectstart = () -> false
+    p = d3.mouse(@vis[0][0]);
+    @downx = @x.invert(p[0]);
 
-  mouseup: () ->
-    self = this;
-    return () ->
-      document.onselectstart = () -> return true
-      d3.select('body').style("cursor", "auto");
-      d3.select('body').style("cursor", "auto");
-      if (!isNaN(self.downx))
-        self.redraw()();
-        self.downx = Math.NaN;
-        d3.event.preventDefault();
-        d3.event.stopPropagation();
-
-      if (!isNaN(self.downy)) 
-        self.redraw()();
-        self.downy = Math.NaN;
-        d3.event.preventDefault();
-        d3.event.stopPropagation();
-
-      if (self.dragged) 
-        self.dragged = null 
-
-  keydown: () ->
-    self = this;
-    return () ->
-      return if not self.selected
-      switch (d3.event.keyCode)
-        when 8, 46   # delete
-          i = self.points.indexOf(self.selected)
-          self.points.splice(i, 1);
-          # self.selected = self.points.length ? self.points[i > 0 ? i - 1 : 0] : null;
-          self.selected = if self.points.length
-            if i > 0 then self.points[i - 1] else self.points[0]
-          else
-            null
-          self.update();
-        
-  xaxis_drag: () ->
-    self = this;
-    return (d) ->
-      document.onselectstart = () -> false
-      p = d3.mouse(self.vis[0][0]);
-      self.downx = self.x.invert(p[0]);
-
-  yaxis_drag: (d) ->
-    self = this;
-    return (d) ->
-      document.onselectstart = () -> false
-      p = d3.mouse(self.vis[0][0]);
-      self.downy = self.y.invert(p[1]);
+  yaxis_drag: (d) =>
+    document.onselectstart = () -> false
+    p = d3.mouse(@vis[0][0]);
+    @downy = @y.invert(p[1]);
 
 
 
