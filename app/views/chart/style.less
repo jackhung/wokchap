@@ -2,27 +2,43 @@
 .chart {
   background-color: #F7F2C5;
   width: 960px;
-  height: 500px; 
+
+  .axis {
+  	font-size: 0.9em;
+  }
+}
+
+#candle-graph {
+	height: 240px;
+}
+#indicator-graph {
+	height: 180px;
+}
+#volume-graph {
+	height: 180px;
 }
 
 rect { fill: #fff; }
 
-.axis { font-size: 1.5em; }
-
 circle, .line {
   fill: none;
   stroke: steelblue;
-  stroke-width: 2px; }
+  stroke-width: 2px; 
+}
 circle {
   fill: white;
   fill-opacity: 0.2;
-  cursor: move; }
-  circle.selected {
-    fill: #ff7f0e;
-    stroke: #ff7f0e; }
-  circle:hover {
-    fill: #ff7f0e;
-    stroke: #707f0e; }
-  circle.selected:hover {
-    fill: #ff7f0e;
-    stroke: #ff7f0e; }
+  cursor: move; 
+}
+circle.selected {
+  fill: #ff7f0e;
+  stroke: #ff7f0e; 
+}
+circle:hover {
+  fill: #ff7f0e;
+  stroke: #707f0e; 
+}
+circle.selected:hover {
+  fill: #ff7f0e;
+  stroke: #ff7f0e; 
+}

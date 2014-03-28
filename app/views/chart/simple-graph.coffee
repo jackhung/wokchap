@@ -60,15 +60,14 @@ module.exports = class SimpleGraph
     xrange =  (@options.xmax - @options.xmin)
     yrange2 = (@options.ymax - @options.ymin) / 2
     yrange4 = yrange2 / 2
-    datacount = @size.width/30
+    datacount = @size.width/20
 
     @points = d3.range(datacount).map( (i) => 
       return { x: i * xrange / datacount, y: @options.ymin + yrange4 + Math.random() * yrange2 }; 
     , self)
 
-    # chart = document.getElementById emid
+    # vis is the 'g' element
     @vis = d3.select(@chart).append("svg")
-    # @vis = d3.select(@$chart).append("svg")
         .attr("width",  @cx)
         .attr("height", @cy)
         .append("g")
@@ -228,16 +227,16 @@ module.exports = class SimpleGraph
     lines = @vis.select("path").attr("d", @line(@points));
           
     circle = @vis.select("svg").selectAll("circle")
-        .data(@points, (d) -> return d)
+        .data(@points)
 
     circle.enter().append("circle")
         .attr("class", (d) => if d is @selected then "selected" else null )
         .attr("cx",    (d) => @x(d.x) )
         .attr("cy",    (d) => @y(d.y) )
-        .attr("r", 10.0)
+        .attr("r", 6.0)
         .style("cursor", "ns-resize")
         .on("mousedown.drag",  @datapoint_drag)
-        .on("touchstart.drag", @datapoint_drag);
+        .on("touchstart.drag", @datapoint_drag)
 
     circle
         .attr("class", (d) => if d is @selected then "selected" else null )
@@ -247,11 +246,11 @@ module.exports = class SimpleGraph
     circle.exit().remove();
 
     if (d3.event && d3.event.keyCode) 
-      d3.event.preventDefault();
+      d3.event.preventDefault()
       d3.event.stopPropagation()
 
   datapoint_drag: (d) =>
-    registerKeyboardHandler(@keydown);
+    registerKeyboardHandler(@keydown)
     document.onselectstart = () -> return false
     @selected = @dragged = d
     @update()
@@ -271,8 +270,8 @@ module.exports = class SimpleGraph
       xaxis2 = @x.domain()[1]
       xextent = xaxis2 - xaxis1
       if (rupx != 0)
-
-        changex = @downx / rupx;
+        #changex = @downx / rupx; ?? avoid negative x? need to varify
+        changex = (@downx - xaxis1) / (rupx - xaxis1);
         new_domain = [xaxis1, xaxis1 + (xextent * changex)];
         @x.domain(new_domain);
         @redraw();
