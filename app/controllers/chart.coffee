@@ -17,11 +17,11 @@ module.exports = class ChartController extends Controller
 
     @model.fetch().then =>
       console.debug "chart#fetched:", @model.attributes
-      @ticker = setInterval =>
-          console.error "model is undefined!!" if not @model
-          @model.fetch()  #self.emit 'tick'
-        , 5000
+      # @ticker = setInterval =>
+      #     console.error "model is undefined!!" if not @model
+      #     @model.fetch()  #self.emit 'tick'
+      #   , 5000
 
   dispose: () ->
-    clearInterval @ticker
+    clearInterval @ticker if @ticker
     super

@@ -21,9 +21,9 @@ module.exports = class ChartView extends View
     @candleGraph = new SimpleGraph 'candle-graph',
       xmax: 60, "xmin": 0
       ymax: 40, "ymin": 0 
-      title: "Simple Graph1"
-      xlabel: "X Axis"
-      ylabel: "Y Axis"  
+      # title: "Simple Graph1"
+      # xlabel: "X Axis"
+      # ylabel: "Y Axis"  
 
     # @iGraph = new SimpleGraphOrig 'indicator-graph',
     #   xmax: 60, "xmin": 0

@@ -22,8 +22,8 @@ module.exports = class NewsListView extends CollectionView
     @subview "pagerView", pagerView
 
 
-  listen: 
-    "change collection" : "render"
+  # listen: 
+  #   "change collection" : "render"
 
   initItemView: (item) =>
     # console.log "NewsListView#initItemView ... #{item.get('title')}"
@@ -36,3 +36,5 @@ module.exports = class NewsListView extends CollectionView
   render: ->
     super
     @subview("pagerView").render()
+
+

@@ -2,14 +2,14 @@
 
 <div id='stock-info' code='<%= @code %>' >
 </div> 
-<div id='chart-container'>
-	<div id='candle-graph' class='chart'>
+<div id='chart-container' class='row'>
+	<div id='candle-graph' class='chart col-md-11'>
 		Candle
 	</div>
-	<div id='indicator-graph' class='chart'>
+	<div id='indicator-graph' class='chart col-md-11'>
 		Indicator
 	</div>
-	<div id='volume-graph' class='chart'>
+	<div id='volume-graph' class='chart col-md-11'>
 		Volume
 	</div>
 </div>

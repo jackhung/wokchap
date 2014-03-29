@@ -36,6 +36,7 @@
 	        <button type="submit" class="btn btn-default">Submit</button>
 	      </form>
 	      <ul class="nav navbar-nav navbar-right">
+	      	<li><a href="chart/00712">Chart</a></li>
 	        <li><a href="book/00712">00712</a></li>
 	        <li><a href="book/00566">00566</a></li>
 	        <li class="dropdown">

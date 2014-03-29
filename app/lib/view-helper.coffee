@@ -3,12 +3,12 @@
 utils = require('./utils')
 
 ViewHelper = 
-
   initTip: () ->
     self = @
     @$el.find(".stock-tip").each (e) ->
       $this = $(@)
       stkCode = $this.attr("ref")
+      console.log "init popover for #{stkCode}"
       $this.popover
         placement: "auto top"
         # selector: "#stk-tip-popover"
@@ -16,7 +16,7 @@ ViewHelper =
         html: true
         content: -> self.tipPopoverContent(stkCode)
         # selector: "#stk-tip-content-container"
-    # ??? are we delegated too many time, should be once on page render, not on each item rendered
+
     @delegate "shown.bs.popover", ".stock-tip", @showTip    
 
   showTip: (e) ->
