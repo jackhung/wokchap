@@ -14,10 +14,6 @@ module.exports = class SimpleGraph
     @$chart = $("##{emid}")
     @cx = @$chart.width()
     @cy = @$chart.height()
-    # @cx = @chart.childWidth
-    # @cy = @chart.childHeight
-    # @cx = 800
-    # @cy = 160
 
     @options = options
     @options.xmax = options.xmax || 30;
@@ -103,13 +99,13 @@ module.exports = class SimpleGraph
 
     # Regenerate x-ticks…
     gx = @vis.selectAll("g.x") .data(@x.ticks(10), String) .attr("transform", tx)
-    gx.select("text") .text(fx)
+    gx.select("text") .text((i) => moment(@pData[+i][0]).format("MMM-DD"))
     gxe = gx.enter().insert("g", "a") .attr("class", "x") .attr("transform", tx)
     gxe.append("line") .attr("stroke", stroke) .attr("y1", 0) .attr("y2", @size.height)
     gxe.append("text") .attr("class", "axis")
         .attr("y", @size.height) .attr("dy", "1em")
         .attr("text-anchor", "middle")
-        .text(fx)
+        .text((i) => moment(@pData[+i][0]).format("MMM-DD"))
         .style("cursor", "ew-resize")
         .on("mouseover", (d) -> d3.select(this).style("font-weight", "bold"))
         .on("mouseout",  (d) -> d3.select(this).style("font-weight", "normal"))
@@ -210,66 +206,6 @@ module.exports = class SimpleGraph
   plot_drag: () =>
     registerKeyboardHandler(@keydown)
     d3.select('body').style("cursor", "move")
-    # if (d3.event.altKey) # ADD A NEW DATA POINT at cursor ...
-    #   p = d3.mouse(@vis.node())
-    #   newpoint = {};
-    #   newpoint.x = @x.invert(Math.max(0, Math.min(@size.width,  p[0])));
-    #   newpoint.y = @y.invert(Math.max(0, Math.min(@size.height, p[1])));
-    #   @points.push(newpoint);
-    #   @points.sort (a, b) ->
-    #     return -1 if a.x < b.x
-    #     return  1 if a.x > b.x
-    #     return 0
-    #   @selected = newpoint
-    #   @update()
-    #   d3.event.preventDefault()
-    #   d3.event.stopPropagation()
-
-  # # REPLACE with redrawP
-  # redraw: () =>
-  #   tx = (d) => "translate(#{@x(d)},0)"
-  #   ty = (d) => "translate(0,#{@y(d)})"
-  #   stroke = (d) -> if d then "#ccc" else "#666"
-  #   fx = @x.tickFormat(10)
-  #   fy = @y.tickFormat(10)
-
-  #   # Regenerate x-ticks…
-  #   gx = @vis.selectAll("g.x") .data(@x.ticks(10), String) .attr("transform", tx)
-  #   gx.select("text") .text(fx)
-  #   gxe = gx.enter().insert("g", "a") .attr("class", "x") .attr("transform", tx)
-  #   gxe.append("line") .attr("stroke", stroke) .attr("y1", 0) .attr("y2", @size.height)
-  #   gxe.append("text") .attr("class", "axis")
-  #       .attr("y", @size.height) .attr("dy", "1em")
-  #       .attr("text-anchor", "middle")
-  #       .text(fx)
-  #       .style("cursor", "ew-resize")
-  #       .on("mouseover", (d) -> d3.select(this).style("font-weight", "bold"))
-  #       .on("mouseout",  (d) -> d3.select(this).style("font-weight", "normal"))
-  #       .on("mousedown.drag",  @xaxis_drag)
-  #       .on("touchstart.drag", @xaxis_drag);
-  #   gx.exit().remove();
-
-  #   # Regenerate y-ticks…
-  #   gy = @vis.selectAll("g.y") .data(@y.ticks(8), String) .attr("transform", ty)
-  #   gy.select("text") .text(fy)
-  #   gye = gy.enter().insert("g", "a") .attr("class", "y") .attr("transform", ty) .attr("background-fill", "#FFEEB6")
-  #   gye.append("line") .attr("stroke", stroke) .attr("x1", 0) .attr("x2", @size.width)
-  #   gye.append("text") .attr("class", "axis")
-  #       .attr("x", -3) .attr("dy", ".35em")
-  #       .attr("text-anchor", "end")
-  #       .text(fy)
-  #       .style("cursor", "ns-resize")
-  #       .on("mouseover", (d) -> d3.select(this).style("font-weight", "bold"))
-  #       .on("mouseout",  (d) -> d3.select(this).style("font-weight", "normal"))
-  #       .on("mousedown.drag",  @yaxis_drag)
-  #       .on("touchstart.drag", @yaxis_drag)
-  #   gy.exit().remove();
-
-  #   @zoom = d3.behavior.zoom().x(@x).on("zoom", @handleZoom)
-  #   @plot.call(@zoom)
-  #   @update();    
-
-  # dataRenderStage: null
 
   update: () =>
     @dataRenderStage = null
@@ -287,7 +223,7 @@ module.exports = class SimpleGraph
         .attr("class", (d) => if d is @selected then "selected" else null )
         .attr("cx", 0.0 )
         .attr("cy", 0.0 )
-        .attr("r", 6.0)
+        .attr("r", 3.0)
         .style("cursor", "ns-resize")
         .on("mousedown.drag",  @datapointDrag)
         .on("touchstart.drag", @datapointDrag)
@@ -296,15 +232,6 @@ module.exports = class SimpleGraph
       .transition() 
           .duration(300) 
           .attr("transform", (d, i) => "translate(#{@x(i)}, #{@y(d[@PCLOSE])})")
-      # .attr("transform", (d, i) => "translate(#{@x(d.x)},#{@y(d.y)})")
-    # circle
-    #     .attr("class", (d) => 
-    #       if @dataRenderStage isnt "UPDATING"
-    #         @dataRenderStage = "UPDATING"
-    #         console.log "UPDATING: start"
-    #       if d is @selected then "selected" else null )
-    #     .attr("cx",    (d) => @x(d.x) )
-    #     .attr("cy",    (d) => @y(d.y) )
 
     circle.exit().remove();
 
@@ -398,8 +325,8 @@ module.exports = class SimpleGraph
     p = d3.mouse @plotArea()
     @downy = @y.invert(p[1]);
 
-  resetZoom: (p = 0.0) =>
-    x0 = @pData.length * p
+  resetZoom: (p = 150) =>
+    x0 = Math.max @pData.length - @pData.length * (p / @pData.length), 60
     @x.domain([x0, @pData.length])
     @y.domain(@visibleYExtend()).nice()
     @redrawP()
@@ -407,26 +334,6 @@ module.exports = class SimpleGraph
   handleZoom: () =>
     translate = d3.event.translate
     scale = d3.event.scale
-    ###
-    ev = d3.event # contains: .translate[x,y], .scale
-    if ev.scale == 1.0
-      x.domain x0.domain()
-      y.domain y0.domain()
-      successfulTranslate = [0, 0]
-    else
-      xTrans = x0.range().map( (xVal) -> (xVal-ev.translate[0]) / ev.scale ).map(x0.invert)
-      yTrans = y0.range().map( (yVal) -> (yVal-ev.translate[1]) / ev.scale ).map(y0.invert)
-      xTransOk = xTrans[0] >= x0.domain()[0] and xTrans[1] <= x0.domain()[1]
-      yTransOk = yTrans[0] >= y0.domain()[0] and yTrans[1] <= y0.domain()[1]
-      if xTransOk
-        x.domain xTrans
-        successfulTranslate[0] = ev.translate[0]
-      if yTransOk
-        y.domain yTrans
-        successfulTranslate[1] = ev.translate[1]
-    zoomer.translate successfulTranslate
-    ###
-    console.debug translate, scale
     @y.domain(@visibleYExtend()).nice()
     @redrawP()
 
@@ -436,11 +343,14 @@ module.exports = class SimpleGraph
   visibleYExtend: -> 
     first = @getDataIndex 0 + 1
     last = Math.min @getDataIndex @size.width - 1, @pData.length
-    console.log "#{first} .. #{last}"
-    ys = for i in [0...@pData.length] when i >= first and i <= last
-      # console.debug i, @points[i]
-      @pData[i][@PCLOSE]
-    [_.max(ys) * 1.1 , _.min(ys) * 0.9 ] # NOTE: inverted order max, min!
+    
+    ylow = Number.MAX_VALUE
+    yhigh = Number.MIN_VALUE
+    for i in [0...@pData.length] when i >= first and i <= last
+      ylow = @pData[i][@PLOW] if @pData[i][@PLOW] < ylow
+      yhigh = @pData[i][@PHIGH] if @pData[i][@PHIGH] > yhigh
+    console.log "#{first} .. #{last} max, min { #{yhigh} #{ylow}"
+    [yhigh * 1.1 , ylow * 0.9 ] # NOTE: inverted order max, min!
 
 registerKeyboardHandler = (callback) ->
   callback = callback
