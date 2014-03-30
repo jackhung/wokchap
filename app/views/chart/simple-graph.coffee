@@ -7,7 +7,6 @@ module.exports = class SimpleGraph
 
   constructor: (emid, options = {}) ->
 
-    self = this
     @chart = document.getElementById emid
     # @$chart = $(emid)
     console.log "SimpleGraph#constructor #{emid}"
@@ -26,7 +25,7 @@ module.exports = class SimpleGraph
     @options.ymax = options.ymax || 10;
     @options.ymin = options.ymin || 0;
     @padding = 
-      top:    if @options.title  then 40 else 20
+      top:    if @options.title  then 40 else 5
       right:                 30
       bottom: if @options.xlabel then 60 else 35
       left:   if @options.ylabel then 70 else 45
@@ -58,11 +57,94 @@ module.exports = class SimpleGraph
     selected: null
 
     @line = d3.svg.line()
-        .x((d, i) => @x(@points[i].x))
-        .y((d, i) => @y(@points[i].y))
+        .x((d, i) => @x(i))
+        .y((d, i) => @y(d[@PCLOSE]))
 
+    @onData()
+
+  PDATE: 0
+  POPEN: 1
+  PHIGH: 2
+  PLOW: 3
+  PCLOSE: 4
+  PVOL: 5
+
+  # Real Stock Data ==============================================================
+  onPriceData: (priceData) =>
+    @model = priceData
+    @pData = priceData.get("priceData")
+    # x-scale
+    @x = d3.scale.linear()
+        .domain([0, @pData.length])
+        .range([0, @size.width]);
+
+    @ymin = d3.min @pData, (d) => d[@PHIGH]
+    @ymax = d3.max @pData, (d) => d[@PLOW]
+    # y-scale (inverted domain)
+    @y = d3.scale.linear()
+        .domain([@ymax, @ymin])
+        .nice()
+        .range([0, @size.height])
+        .nice();
+
+    @line = d3.svg.line()
+        .x((d, i) => @x(i))
+        .y((d, i) => @y(d[@PCLOSE]))
+
+    @withData()
+    @redrawP()
+
+  redrawP: () =>
+    tx = (d) => "translate(#{@x(d)},0)"
+    ty = (d) => "translate(0,#{@y(d)})"
+    stroke = (d) -> if d then "#ccc" else "#666"
+    fx = @x.tickFormat(8)
+    fy = @y.tickFormat(10)
+
+    # Regenerate x-ticks…
+    gx = @vis.selectAll("g.x") .data(@x.ticks(10), String) .attr("transform", tx)
+    gx.select("text") .text(fx)
+    gxe = gx.enter().insert("g", "a") .attr("class", "x") .attr("transform", tx)
+    gxe.append("line") .attr("stroke", stroke) .attr("y1", 0) .attr("y2", @size.height)
+    gxe.append("text") .attr("class", "axis")
+        .attr("y", @size.height) .attr("dy", "1em")
+        .attr("text-anchor", "middle")
+        .text(fx)
+        .style("cursor", "ew-resize")
+        .on("mouseover", (d) -> d3.select(this).style("font-weight", "bold"))
+        .on("mouseout",  (d) -> d3.select(this).style("font-weight", "normal"))
+        .on("mousedown.drag",  @xaxis_drag)
+        .on("touchstart.drag", @xaxis_drag);
+    gx.exit().remove();
+
+    # Regenerate y-ticks…
+    gy = @vis.selectAll("g.y") .data(@y.ticks(8), String) .attr("transform", ty)
+    gy.select("text") .text(fy)
+    gye = gy.enter().insert("g", "a") .attr("class", "y") .attr("transform", ty) .attr("background-fill", "#FFEEB6")
+    gye.append("line") .attr("stroke", stroke) .attr("x1", 0) .attr("x2", @size.width)
+    gye.append("text") .attr("class", "axis")
+        .attr("x", -3) .attr("dy", ".35em")
+        .attr("text-anchor", "end")
+        .text(fy)
+        .style("cursor", "ns-resize")
+        .on("mouseover", (d) -> d3.select(this).style("font-weight", "bold"))
+        .on("mouseout",  (d) -> d3.select(this).style("font-weight", "normal"))
+        .on("mousedown.drag",  @yaxis_drag)
+        .on("touchstart.drag", @yaxis_drag)
+    gy.exit().remove();
+
+    @zoom = d3.behavior.zoom().x(@x).on("zoom", @handleZoom)
+    @plot.call(@zoom)
+    @update();    
+
+  onData: ->
     @setData()
+    # @withData()
+    # @redraw()
 
+  # Test data =====================================================================
+  withData: () ->
+    self = this
     # vis is the 'g' element
     @vis = d3.select(@chart).append("svg") .attr("width",  @cx) .attr("height", @cy)
         .append("g")
@@ -86,7 +168,7 @@ module.exports = class SimpleGraph
         .attr("class", "line")
         .append("path")
             .attr("class", "line")
-            .attr("d", @line(@points))
+            .attr("d", @line(@pData))
     
     # add Chart Title
     if (@options.title)
@@ -105,12 +187,10 @@ module.exports = class SimpleGraph
           .attr("transform","translate(" + -40 + " " + @size.height/2+") rotate(-90)");
 
     d3.select(@chart)
-        .on("mousemove.drag", self.mousemove)
-        .on("touchmove.drag", self.mousemove)
-        .on("mouseup.drag",   self.mouseup)
-        .on("touchend.drag",  self.mouseup)
-
-    @redraw()
+        .on("mousemove.drag", @mousemove)
+        .on("touchmove.drag", @mousemove)
+        .on("mouseup.drag",   @mouseup)
+        .on("touchend.drag",  @mouseup)
 
   setData: () ->
     xrange =  (@options.xmax - @options.xmin)
@@ -122,90 +202,89 @@ module.exports = class SimpleGraph
       return { x: i * xrange / datacount, y: @options.ymin + yrange4 + Math.random() * yrange2 }; 
     , self)
 
+
+  # ================================================================================
   plotArea: () ->
     @vis.node() #@vis[0][0]
 
   plot_drag: () =>
     registerKeyboardHandler(@keydown)
     d3.select('body').style("cursor", "move")
-    if (d3.event.altKey) 
-      p = d3.mouse(@vis.node())
-      newpoint = {};
-      newpoint.x = @x.invert(Math.max(0, Math.min(@size.width,  p[0])));
-      newpoint.y = @y.invert(Math.max(0, Math.min(@size.height, p[1])));
-      @points.push(newpoint);
-      @points.sort (a, b) ->
-        return -1 if a.x < b.x
-        return  1 if a.x > b.x
-        return 0
-      @selected = newpoint
-      @update()
-      d3.event.preventDefault()
-      d3.event.stopPropagation()
+    # if (d3.event.altKey) # ADD A NEW DATA POINT at cursor ...
+    #   p = d3.mouse(@vis.node())
+    #   newpoint = {};
+    #   newpoint.x = @x.invert(Math.max(0, Math.min(@size.width,  p[0])));
+    #   newpoint.y = @y.invert(Math.max(0, Math.min(@size.height, p[1])));
+    #   @points.push(newpoint);
+    #   @points.sort (a, b) ->
+    #     return -1 if a.x < b.x
+    #     return  1 if a.x > b.x
+    #     return 0
+    #   @selected = newpoint
+    #   @update()
+    #   d3.event.preventDefault()
+    #   d3.event.stopPropagation()
 
-  redraw: () =>
-    tx = (d) => "translate(#{@x(d)},0)"
-    ty = (d) => "translate(0,#{@y(d)})"
-    stroke = (d) -> if d then "#ccc" else "#666"
-    fx = @x.tickFormat(10)
-    fy = @y.tickFormat(10)
+  # # REPLACE with redrawP
+  # redraw: () =>
+  #   tx = (d) => "translate(#{@x(d)},0)"
+  #   ty = (d) => "translate(0,#{@y(d)})"
+  #   stroke = (d) -> if d then "#ccc" else "#666"
+  #   fx = @x.tickFormat(10)
+  #   fy = @y.tickFormat(10)
 
-    # Regenerate x-ticks…
-    gx = @vis.selectAll("g.x") .data(@x.ticks(10), String) .attr("transform", tx)
-    gx.select("text") .text(fx)
-    gxe = gx.enter().insert("g", "a") .attr("class", "x") .attr("transform", tx)
-    gxe.append("line") .attr("stroke", stroke) .attr("y1", 0) .attr("y2", @size.height)
-    gxe.append("text") .attr("class", "axis")
-        .attr("y", @size.height) .attr("dy", "1em")
-        .attr("text-anchor", "middle")
-        .text(fx)
-        .style("cursor", "ew-resize")
-        .on("mouseover", (d) -> d3.select(this).style("font-weight", "bold"))
-        .on("mouseout",  (d) -> d3.select(this).style("font-weight", "normal"))
-        .on("mousedown.drag",  @xaxis_drag)
-        .on("touchstart.drag", @xaxis_drag);
-    gx.exit().remove();
+  #   # Regenerate x-ticks…
+  #   gx = @vis.selectAll("g.x") .data(@x.ticks(10), String) .attr("transform", tx)
+  #   gx.select("text") .text(fx)
+  #   gxe = gx.enter().insert("g", "a") .attr("class", "x") .attr("transform", tx)
+  #   gxe.append("line") .attr("stroke", stroke) .attr("y1", 0) .attr("y2", @size.height)
+  #   gxe.append("text") .attr("class", "axis")
+  #       .attr("y", @size.height) .attr("dy", "1em")
+  #       .attr("text-anchor", "middle")
+  #       .text(fx)
+  #       .style("cursor", "ew-resize")
+  #       .on("mouseover", (d) -> d3.select(this).style("font-weight", "bold"))
+  #       .on("mouseout",  (d) -> d3.select(this).style("font-weight", "normal"))
+  #       .on("mousedown.drag",  @xaxis_drag)
+  #       .on("touchstart.drag", @xaxis_drag);
+  #   gx.exit().remove();
 
-    # Regenerate y-ticks…
-    gy = @vis.selectAll("g.y") .data(@y.ticks(10), String) .attr("transform", ty)
-    gy.select("text") .text(fy)
-    gye = gy.enter().insert("g", "a") .attr("class", "y") .attr("transform", ty) .attr("background-fill", "#FFEEB6")
-    gye.append("line") .attr("stroke", stroke) .attr("x1", 0) .attr("x2", @size.width)
-    gye.append("text") .attr("class", "axis")
-        .attr("x", -3) .attr("dy", ".35em")
-        .attr("text-anchor", "end")
-        .text(fy)
-        .style("cursor", "ns-resize")
-        .on("mouseover", (d) -> d3.select(this).style("font-weight", "bold"))
-        .on("mouseout",  (d) -> d3.select(this).style("font-weight", "normal"))
-        .on("mousedown.drag",  @yaxis_drag)
-        .on("touchstart.drag", @yaxis_drag)
-    gy.exit().remove();
+  #   # Regenerate y-ticks…
+  #   gy = @vis.selectAll("g.y") .data(@y.ticks(8), String) .attr("transform", ty)
+  #   gy.select("text") .text(fy)
+  #   gye = gy.enter().insert("g", "a") .attr("class", "y") .attr("transform", ty) .attr("background-fill", "#FFEEB6")
+  #   gye.append("line") .attr("stroke", stroke) .attr("x1", 0) .attr("x2", @size.width)
+  #   gye.append("text") .attr("class", "axis")
+  #       .attr("x", -3) .attr("dy", ".35em")
+  #       .attr("text-anchor", "end")
+  #       .text(fy)
+  #       .style("cursor", "ns-resize")
+  #       .on("mouseover", (d) -> d3.select(this).style("font-weight", "bold"))
+  #       .on("mouseout",  (d) -> d3.select(this).style("font-weight", "normal"))
+  #       .on("mousedown.drag",  @yaxis_drag)
+  #       .on("touchstart.drag", @yaxis_drag)
+  #   gy.exit().remove();
 
-    @zoom = d3.behavior.zoom().x(@x).on("zoom", @handleZoom)
-    @plot.call(@zoom)
-    @update();    
+  #   @zoom = d3.behavior.zoom().x(@x).on("zoom", @handleZoom)
+  #   @plot.call(@zoom)
+  #   @update();    
 
-  dataRenderStage: null
+  # dataRenderStage: null
 
   update: () =>
     @dataRenderStage = null
-    lines = @vis.select("path").attr("d", @line(@points));
+    lines = @vis.select("path").attr("d", @line(@pData));
           
     circle = @vis.select("svg").selectAll(".datapoint")
-        .data(@points)
+        .data(@pData)
 
     dataPoint = circle.enter().append("g")
       .attr("class", "datapoint")
-      .attr("transform", (d, i) => "translate(#{@x(d.x)},#{@y(d.y)})")
+      # .attr("transform", (d, i) => "translate(#{@x(i)},#{@y(d[@PCLOSE])})")
 
     # circle.enter().append("circle")
     dataPoint.append("circle")
-        .attr("class", (d) =>
-          if @dataRenderStage isnt "ENTERING"
-            @dataRenderStage = "ENTERING"
-            console.log "ENTERING: start"
-          if d is @selected then "selected" else null )
+        .attr("class", (d) => if d is @selected then "selected" else null )
         .attr("cx", 0.0 )
         .attr("cy", 0.0 )
         .attr("r", 6.0)
@@ -216,7 +295,7 @@ module.exports = class SimpleGraph
     circle
       .transition() 
           .duration(300) 
-          .attr("transform", (d, i) => "translate(#{@x(d.x)}, #{@y(d.y)})")
+          .attr("transform", (d, i) => "translate(#{@x(i)}, #{@y(d[@PCLOSE])})")
       # .attr("transform", (d, i) => "translate(#{@x(d.x)},#{@y(d.y)})")
     # circle
     #     .attr("class", (d) => 
@@ -258,7 +337,7 @@ module.exports = class SimpleGraph
         changex = (@downx - xaxis1) / (rupx - xaxis1);
         new_domain = [xaxis1, xaxis1 + (xextent * changex)];
         @x.domain(new_domain);
-        @redraw();
+        @redrawP();
   
       d3.event.preventDefault();
       d3.event.stopPropagation();
@@ -273,7 +352,7 @@ module.exports = class SimpleGraph
         changey = @downy / rupy;
         new_domain = [yaxis1 + (yextent * changey), yaxis1];
         @y.domain(new_domain);
-        @redraw();
+        @redrawP();
       
       d3.event.preventDefault();
       d3.event.stopPropagation();
@@ -282,13 +361,13 @@ module.exports = class SimpleGraph
     document.onselectstart = () -> return true
     d3.select('body').style("cursor", "auto");
     if (!isNaN(@downx))
-      @redraw();
+      @redrawP();
       @downx = Math.NaN;
       d3.event.preventDefault();
       d3.event.stopPropagation();
 
     if (!isNaN(@downy)) 
-      @redraw();
+      @redrawP();
       @downy = Math.NaN;
       d3.event.preventDefault();
       d3.event.stopPropagation();
@@ -320,9 +399,10 @@ module.exports = class SimpleGraph
     @downy = @y.invert(p[1]);
 
   resetZoom: (p = 0.0) =>
-    x0 = (@options.xmax - @options.xmin) * p
-    @x.domain([x0, @options.xmax])
-    @redraw()
+    x0 = @pData.length * p
+    @x.domain([x0, @pData.length])
+    @y.domain(@visibleYExtend()).nice()
+    @redrawP()
 
   handleZoom: () =>
     translate = d3.event.translate
@@ -348,19 +428,19 @@ module.exports = class SimpleGraph
     ###
     console.debug translate, scale
     @y.domain(@visibleYExtend()).nice()
-    @redraw()
+    @redrawP()
 
   getDataIndex: (cx) ->
     Math.floor(@x.invert(cx) + 0.5)
 
   visibleYExtend: -> 
     first = @getDataIndex 0 + 1
-    last = Math.min @getDataIndex @size.width - 1, @points.length
+    last = Math.min @getDataIndex @size.width - 1, @pData.length
     console.log "#{first} .. #{last}"
-    ys = for i in [0...@points.length] when @points[i].x >= first and @points[i].x <= last
+    ys = for i in [0...@pData.length] when i >= first and i <= last
       # console.debug i, @points[i]
-      @points[i].y
-    [_.max(ys) + 1 , _.min(ys) - 1 ] # NOTE: inverted order max, min!
+      @pData[i][@PCLOSE]
+    [_.max(ys) * 1.1 , _.min(ys) * 0.9 ] # NOTE: inverted order max, min!
 
 registerKeyboardHandler = (callback) ->
   callback = callback

@@ -3,6 +3,7 @@
 View = require('views/base/view')
 SimpleGraph = require "views/chart/simple-graph"
 SimpleGraphOrig = require "views/chart/js-simple-graph"
+PriceData = require "views/chart/stock-price-service"
 
 module.exports = class ChartView extends View
   className: 'chart-view'
@@ -31,6 +32,11 @@ module.exports = class ChartView extends View
     #   title: "Simple Graph1"
     #   xlabel: "X Axis"
     #   ylabel: "Y Axis" 
+    @priceData = new PriceData 
+      stkCode: "00123"
+    @priceData.doFetch().then =>
+      console.log ".............. fetched"
+      @candleGraph.onPriceData @priceData
 
   listen: 
     "change model" : "render"
