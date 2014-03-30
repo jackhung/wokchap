@@ -214,7 +214,10 @@ module.exports = class SimpleGraph
         .on("touchstart.drag", @datapointDrag)
 
     circle
-      .attr("transform", (d, i) => "translate(#{@x(d.x)},#{@y(d.y)})")
+      .transition() 
+          .duration(300) 
+          .attr("transform", (d, i) => "translate(#{@x(d.x)}, #{@y(d.y)})")
+      # .attr("transform", (d, i) => "translate(#{@x(d.x)},#{@y(d.y)})")
     # circle
     #     .attr("class", (d) => 
     #       if @dataRenderStage isnt "UPDATING"
@@ -315,6 +318,11 @@ module.exports = class SimpleGraph
     document.onselectstart = () -> false
     p = d3.mouse @plotArea()
     @downy = @y.invert(p[1]);
+
+  resetZoom: (p = 0.0) =>
+    x0 = (@options.xmax - @options.xmin) * p
+    @x.domain([x0, @options.xmax])
+    @redraw()
 
   handleZoom: () =>
     translate = d3.event.translate
