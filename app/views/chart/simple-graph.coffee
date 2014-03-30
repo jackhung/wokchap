@@ -186,25 +186,43 @@ module.exports = class SimpleGraph
     @plot.call(@zoom)
     @update();    
 
+  dataRenderStage: null
+
   update: () =>
+    @dataRenderStage = null
     lines = @vis.select("path").attr("d", @line(@points));
           
-    circle = @vis.select("svg").selectAll("circle")
+    circle = @vis.select("svg").selectAll(".datapoint")
         .data(@points)
 
-    circle.enter().append("circle")
-        .attr("class", (d) => if d is @selected then "selected" else null )
-        .attr("cx",    (d) => @x(d.x) )
-        .attr("cy",    (d) => @y(d.y) )
+    dataPoint = circle.enter().append("g")
+      .attr("class", "datapoint")
+      .attr("transform", (d, i) => "translate(#{@x(d.x)},#{@y(d.y)})")
+
+    # circle.enter().append("circle")
+    dataPoint.append("circle")
+        .attr("class", (d) =>
+          if @dataRenderStage isnt "ENTERING"
+            @dataRenderStage = "ENTERING"
+            console.log "ENTERING: start"
+          if d is @selected then "selected" else null )
+        .attr("cx", 0.0 )
+        .attr("cy", 0.0 )
         .attr("r", 6.0)
         .style("cursor", "ns-resize")
         .on("mousedown.drag",  @datapointDrag)
         .on("touchstart.drag", @datapointDrag)
 
     circle
-        .attr("class", (d) => if d is @selected then "selected" else null )
-        .attr("cx",    (d) => @x(d.x) )
-        .attr("cy",    (d) => @y(d.y) )
+      .attr("transform", (d, i) => "translate(#{@x(d.x)},#{@y(d.y)})")
+    # circle
+    #     .attr("class", (d) => 
+    #       if @dataRenderStage isnt "UPDATING"
+    #         @dataRenderStage = "UPDATING"
+    #         console.log "UPDATING: start"
+    #       if d is @selected then "selected" else null )
+    #     .attr("cx",    (d) => @x(d.x) )
+    #     .attr("cy",    (d) => @y(d.y) )
 
     circle.exit().remove();
 
