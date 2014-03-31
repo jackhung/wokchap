@@ -20,18 +20,7 @@ module.exports = class ChartView extends View
   createCandleGraph: =>
     console.debug "ChartView#createCandleGraph: ", $('#candle-graph')
     @candleGraph = new SimpleGraph 'candle-graph',
-      xmax: 60, "xmin": 0
-      ymax: 40, "ymin": 0 
-      # title: "Simple Graph1"
-      # xlabel: "X Axis"
-      # ylabel: "Y Axis"  
 
-    # @iGraph = new SimpleGraphOrig 'indicator-graph',
-    #   xmax: 60, "xmin": 0
-    #   ymax: 40, "ymin": 0 
-    #   title: "Simple Graph1"
-    #   xlabel: "X Axis"
-    #   ylabel: "Y Axis" 
     @priceData = new PriceData 
       stkCode: @model.get('code')
     @priceData.doFetch().then =>
@@ -40,11 +29,16 @@ module.exports = class ChartView extends View
       @candleGraph.resetZoom()
 
   listen: 
-    "change model" : "render"
+    "change model" : "updateChart"
+    # "sync model" : "updateChart"
+
+  updateChart: ->
+    @candleGraph?.updateQuote @model.attributes
 
   render: ->
     super
-    _.defer @createCandleGraph
+    console.debug @model.attributes, @candleGraph
+    _.defer @createCandleGraph unless @candleGraph
 
   dispose: ->
     console.log "ChartView#dispose"

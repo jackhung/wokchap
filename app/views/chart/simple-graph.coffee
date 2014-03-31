@@ -6,6 +6,8 @@ View = require 'views/base/view'
 
 module.exports = class SimpleGraph extends View
 
+
+
   constructor: (emid, options = {}) ->
 
     @chart = document.getElementById emid
@@ -61,6 +63,25 @@ module.exports = class SimpleGraph extends View
     @initChartElements()
     @redrawP()
 
+  updateQuote: (quote) ->
+    unless @pData
+      console.log "priceData is not ready when receiving rtquote"
+      return
+    lastRecord = @pData[@pData.length - 1]
+    quoteDate = moment quote.date, "MM/DD/YYYY"
+    lastDate = moment lastRecord[0]
+    if quoteDate.isSame(lastDate)
+      lastRecord[1] = quote.open
+      lastRecord[2] = quote.high
+      lastRecord[3] = quote.low
+      lastRecord[4] = quote.close
+      lastRecord[5] = quote.volume
+    else
+      @pData.push [quoteDate, quote.open, quote.high, quote.low, quote.close, quote.volume]
+    @resetZoom()
+
+    console.log "#{quoteDate.format('YYYY/MM/DD')} #{lastDate.format('YYYY/MM/DD')}"
+
   redrawP: () =>
     tx = (d) => "translate(#{@x(d)},0)"
     ty = (d) => "translate(0,#{@y(d)})"
@@ -86,11 +107,11 @@ module.exports = class SimpleGraph extends View
 
     # Regenerate y-ticks…
     gy = @bgPane.selectAll("g.y") .data(@y.ticks(8), String) .attr("transform", ty)
-    gy.select("text") .text(fy)
+    # gy.select("text") .text(fy)
     gye = gy.enter().insert("g", "a") .attr("class", "y") .attr("transform", ty) .attr("background-fill", "#FFEEB6")
     gye.append("line") .attr("stroke", stroke) .attr("x1", 0) .attr("x2", @size.width)
     gye.append("text") .attr("class", "axis")
-        .attr("x", -3) .attr("dy", ".35em")
+        .attr("x", @size.width + 20) .attr("dy", ".35em")
         .attr("text-anchor", "end")
         .text(fy)
         .style("cursor", "ns-resize")
@@ -216,8 +237,6 @@ module.exports = class SimpleGraph extends View
     @vis.select("svg").selectAll(".candle .candle-body")
 
   drawCandle: ->
-
-
     candle = @vis.select("svg").selectAll(".candle").data(@pData)
 
     group = candle.enter().append("g") .attr("class", "candle")
@@ -228,11 +247,9 @@ module.exports = class SimpleGraph extends View
     group.append("svg:rect")
       .attr("class", (d) => if d[@POPEN] > d[@PCLOSE] then "candle-body price-down" else "candle-body price-up")
 
-    @allCandleStems("top") 
-      .attr("x1", 0).attr("y1", (d) => @y d[@PHIGH])
+    @allCandleStems("top") .attr("x1", 0).attr("y1", (d) => @y d[@PHIGH])
       .attr("x2", 0).attr("y2", (d) => @y(Math.max d[@POPEN], d[@PCLOSE]))
-    @allCandleStems("bottom") 
-      .attr("x1", 0).attr("y1", (d) => @y d[@PLOW])
+    @allCandleStems("bottom") .attr("x1", 0).attr("y1", (d) => @y d[@PLOW])
       .attr("x2", 0).attr("y2", (d) => @y(Math.min d[@POPEN], d[@PCLOSE]))
 
     rectWidth = Math.abs(@x(1) - @x(0) ) * 0.6

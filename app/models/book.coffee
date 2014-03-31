@@ -9,5 +9,5 @@ module.exports = class Book extends Model
   # code: "book-cid"
 
   parse: (data) ->
-    console.log ("Book#parse #{data.result.cName}")
+    # console.log ("Book#parse #{data.result.cName}")
     data.result

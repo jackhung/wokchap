@@ -13,14 +13,14 @@ module.exports = class ChartController extends Controller
 
   show: (params) ->
     @model = new Book(code: params.code)
-    @view = new ChartView( model: @model, autoRender: false, containerMethod: "html" )
+    @view = new ChartView( model: @model, containerMethod: "html" )
 
     @model.fetch().then =>
       console.debug "chart#fetched:", @model.attributes
-      # @ticker = setInterval =>
-      #     console.error "model is undefined!!" if not @model
-      #     @model.fetch()  #self.emit 'tick'
-      #   , 5000
+      @ticker = setInterval =>
+          console.error "model is undefined!!" if not @model
+          @model.fetch()  #self.emit 'tick'
+        , 5000
 
   dispose: () ->
     clearInterval @ticker if @ticker
