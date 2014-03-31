@@ -4,7 +4,6 @@
 </div> 
 <div id='chart-container' class='row'>
 	<div id='candle-graph' class='chart col-md-11'>
-		Candle
 	</div>
 	<div id='indicator-graph' class='chart col-md-11'>
 		Indicator

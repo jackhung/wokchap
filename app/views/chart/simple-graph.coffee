@@ -2,8 +2,9 @@
 
 ChartOptions = require 'views/chart/chart-options'
 PriceService = require 'views/chart/stock-price-service'
+View = require 'views/base/view'
 
-module.exports = class SimpleGraph
+module.exports = class SimpleGraph extends View
 
   constructor: (emid, options = {}) ->
 
@@ -16,10 +17,7 @@ module.exports = class SimpleGraph
     @cy = @$chart.height()
 
     @options = options
-    @options.xmax = options.xmax || 30;
-    @options.xmin = options.xmin || 0;
-    @options.ymax = options.ymax || 10;
-    @options.ymin = options.ymin || 0;
+
     @padding = 
       top:    if @options.title  then 40 else 5
       right:                 30
@@ -31,32 +29,10 @@ module.exports = class SimpleGraph
       "height": @cy - @padding.top  - @padding.bottom
     };
 
-    # x-scale
-    @x = d3.scale.linear()
-        .domain([@options.xmin, @options.xmax])
-        .range([0, @size.width]);
-
-    # drag x-axis logic
-    @downx = Math.NaN;
-
-    # y-scale (inverted domain)
-    @y = d3.scale.linear()
-        .domain([@options.ymax, @options.ymin])
-        .nice()
-        .range([0, @size.height])
-        .nice();
-
-    # drag y-axis logic
     @downy = Math.NaN;
 
     dragged: null
     selected: null
-
-    @line = d3.svg.line()
-        .x((d, i) => @x i)
-        .y((d, i) => @y d[@PCLOSE])
-
-    @onData()
 
   PDATE: 0
   POPEN: 1
@@ -79,15 +55,10 @@ module.exports = class SimpleGraph
     # y-scale (inverted domain)
     @y = d3.scale.linear()
         .domain([@ymax, @ymin])
-        .nice()
         .range([0, @size.height])
         .nice();
 
-    @line = d3.svg.line()
-        .x((d, i) => @x(i))
-        .y((d, i) => @y(d[@PCLOSE]))
-
-    @withData()
+    @initChartElements()
     @redrawP()
 
   redrawP: () =>
@@ -98,7 +69,7 @@ module.exports = class SimpleGraph
     fy = @y.tickFormat(10)
 
     # Regenerate x-ticks…
-    gx = @vis.selectAll("g.x") .data(@x.ticks(10), String) .attr("transform", tx)
+    gx = @bgPane.selectAll("g.x") .data(@x.ticks(10), String) .attr("transform", tx)
     gx.select("text") .text((i) => moment(@pData[+i][0]).format("MMM-DD"))
     gxe = gx.enter().insert("g", "a") .attr("class", "x") .attr("transform", tx)
     gxe.append("line") .attr("stroke", stroke) .attr("y1", 0) .attr("y2", @size.height)
@@ -114,7 +85,7 @@ module.exports = class SimpleGraph
     gx.exit().remove();
 
     # Regenerate y-ticks…
-    gy = @vis.selectAll("g.y") .data(@y.ticks(8), String) .attr("transform", ty)
+    gy = @bgPane.selectAll("g.y") .data(@y.ticks(8), String) .attr("transform", ty)
     gy.select("text") .text(fy)
     gye = gy.enter().insert("g", "a") .attr("class", "y") .attr("transform", ty) .attr("background-fill", "#FFEEB6")
     gye.append("line") .attr("stroke", stroke) .attr("x1", 0) .attr("x2", @size.width)
@@ -133,23 +104,25 @@ module.exports = class SimpleGraph
     @plot.call(@zoom)
     @update();    
 
-  onData: ->
-    @setData()
-    # @withData()
-    # @redraw()
 
-  # Test data =====================================================================
-  withData: () ->
-    self = this
+  initChartElements: () ->
+    throw "Already initialized error!" if $(@chart).find('svg').length
+
+    @svg = d3.select(@chart).append("svg") .attr("width",  @cx) .attr("height", @cy)
+
+    @bgPane = @svg.append("g")
+          .attr("class", "plot-background")
+          .attr("transform", "translate(" + @padding.left + "," + @padding.top + ")")
+    @bgPane.append("rect") .attr("width", @size.width) .attr("height", @size.height)
+
     # vis is the 'g' element
-    @vis = d3.select(@chart).append("svg") .attr("width",  @cx) .attr("height", @cy)
-        .append("g")
+    @vis = @svg.append("g")
           .attr("class", "plot-area")
           .attr("transform", "translate(" + @padding.left + "," + @padding.top + ")")
 
     # plot: the plot area for the data
     @plot = @vis.append("rect") .attr("width", @size.width) .attr("height", @size.height)
-        .style("fill", "#EEEE99")
+        .style("fill", "none")
         .attr("pointer-events", "all")
         .on("mousedown.drag", @plot_drag)
         .on("touchstart.drag", @plot_drag)
@@ -162,9 +135,7 @@ module.exports = class SimpleGraph
         .attr("top", 0) .attr("left", 0) .attr("width", @size.width) .attr("height", @size.height)
         .attr("viewBox", "0 0 "+@size.width+" "+@size.height)
         .attr("class", "line")
-        # .append("path")
-        #     .attr("class", "line")
-        #     .attr("d", @line(@pData))
+
     
     # add Chart Title
     if (@options.title)
@@ -187,17 +158,6 @@ module.exports = class SimpleGraph
         .on("touchmove.drag", @mousemove)
         .on("mouseup.drag",   @mouseup)
         .on("touchend.drag",  @mouseup)
-
-  setData: () ->
-    xrange =  (@options.xmax - @options.xmin)
-    yrange2 = (@options.ymax - @options.ymin) / 2
-    yrange4 = yrange2 / 2
-    datacount = @size.width/20
-
-    @points = d3.range(datacount).map( (i) => 
-      return { x: i * xrange / datacount, y: @options.ymin + yrange4 + Math.random() * yrange2 }; 
-    , self)
-
 
   # ================================================================================
   plotArea: () ->
@@ -249,60 +209,43 @@ module.exports = class SimpleGraph
   allStems: ->
     @allCandles().selectAll("line")
 
-  allCandleStems: ->
-    @vis.select("svg").selectAll(".candle .stem")
+  allCandleStems: (topBottom = "top") ->
+    @vis.select("svg").selectAll(".candle .stem.#{topBottom}")
 
   allCandleBodies: ->
     @vis.select("svg").selectAll(".candle .candle-body")
 
   drawCandle: ->
-    dataCnt = @pData.length
-    cWidth = (@width / dataCnt) * 0.8
-    xOff = cWidth / 2
 
-    candle = @vis.select("svg").selectAll(".candle")
-        .data(@pData)
+
+    candle = @vis.select("svg").selectAll(".candle").data(@pData)
+
+    group = candle.enter().append("g") .attr("class", "candle")
+    group.append("svg:line") 
+      .attr("class", (d) => if d[@POPEN] > d[@PCLOSE] then "stem top price-down" else "stem top price-up")
+    group.append("svg:line") 
+      .attr("class", (d) => if d[@POPEN] > d[@PCLOSE] then "stem bottom price-down" else "stem bottom price-up")
+    group.append("svg:rect")
+      .attr("class", (d) => if d[@POPEN] > d[@PCLOSE] then "candle-body price-down" else "candle-body price-up")
+
+    @allCandleStems("top") 
+      .attr("x1", 0).attr("y1", (d) => @y d[@PHIGH])
+      .attr("x2", 0).attr("y2", (d) => @y(Math.max d[@POPEN], d[@PCLOSE]))
+    @allCandleStems("bottom") 
+      .attr("x1", 0).attr("y1", (d) => @y d[@PLOW])
+      .attr("x2", 0).attr("y2", (d) => @y(Math.min d[@POPEN], d[@PCLOSE]))
 
     rectWidth = Math.abs(@x(1) - @x(0) ) * 0.6
     rectHeightRatio = Math.abs(@y(1) - @y(0))
-    console.log "w/h #{rectWidth} #{rectHeightRatio}"
-
-    group = candle.enter().append("g")
-      .attr("class", "candle")
-    group.append("svg:line") 
-      .attr("class", (d) => if d[@POPEN] > d[@PCLOSE] then "stem price-down" else "stem price-up")
-      .attr("x1", (d, i) => 0).attr("y1", (d) => @y d[@PLOW])
-      .attr("x2", (d, i) => 0).attr("y2", (d) => @y d[@PHIGH])
-    group.append("svg:rect")
-      .attr("class", (d) => if d[@POPEN] > d[@PCLOSE] then "candle-body price-down" else "candle-body price-up")
-      .attr("y", (d) => @y(Math.max( d[@POPEN], d[@PCLOSE] )))
-      # .attr("height", (d) => @y(Math.abs(d[@POPEN] - d[@PCLOSE])))
-      
-          # .attr("x1", (d, i) => -0.4).attr("y1", (d) => 100)
-          # .attr("x2", (d, i) => 0.4).attr("y2", (d) => 160)
-          # .attr("stroke", (d) => if d[@POPEN] > d[@PCLOSE] then "red" else "blue")
-
-    # elems = @drawingArea.selectAll("line.stem")
-    #   .data(@priceData)
-    # stems = candle.selectAll("line .stem")
-    # stems.attr("class", (d) => if d[@POPEN] > d[@PCLOSE] then "price-down" else "price-up")
-    @allCandleStems() 
-        .attr("x1", (d, i) => 0).attr("y1", (d) => @y d[@PLOW])
-        .attr("x2", (d, i) => 0).attr("y2", (d) => @y d[@PHIGH])
     @allCandleBodies()
       .attr("y", (d) => @y(Math.max( d[@POPEN], d[@PCLOSE] )))
       .attr("height", (d) => Math.abs(@y(d[@PCLOSE]) - @y(d[@POPEN])) or 0.5)
       .attr("x", -rectWidth/2)
       .attr("width", rectWidth)
-        # .attr("x1", (d, i) => -0.4).attr("y1", (d) => 100)
-        # .attr("x2", (d, i) => 0.4).attr("y2", (d) => 160)
-        # .attr("stroke", (d) => if d[@POPEN] > d[@PCLOSE] then "red" else "blue")
+
     candle.exit().remove()
 
-    candle
-      .transition() 
-          .duration(100) 
-          .attr("transform", (d, i) => "translate(#{@x(i)}, 0)")
+    candle .transition() .duration(100) .attr("transform", (d, i) => "translate(#{@x(i)}, 0)")
 
   datapointDrag: (d) =>
     registerKeyboardHandler(@keydown)
