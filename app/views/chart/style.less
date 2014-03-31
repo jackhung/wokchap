@@ -1,6 +1,6 @@
 
 .chart {
-  background-color: #F7F2C5;
+  background-color: #B7B295;
   .axis {
   	font-size: 0.9em;
   }
@@ -14,6 +14,30 @@
 }
 #volume-graph {
 	height: 180px;
+}
+
+.price-up {
+	stroke: blue;
+}
+.price-down {
+	stroke: red;
+}
+
+rect.candle-box {
+  fill: #88F;
+  opacity: 0.6;
+}
+rect.candle-box.down {
+  fill: #F88;
+}
+.candle .stem , .candle-body {
+	stroke-width: 1px;
+}
+.candle-body {
+	fill: none;
+}
+.candle-body:hover {
+	fill: #ccc;
 }
 
 rect { fill: #fff; }

@@ -69,7 +69,7 @@ module.exports = class PriceService extends Backbone.Model
           vol = parseFloat(data.vol[i])
           if (open < 0) # handle suspend data
             open = high = low = close
-          priceData.push [d.toString(), open, high, low, close, vol] unless isNaN(close)
+          priceData.push [d.toString(), open, high, low, close, vol] unless isNaN(close) or isNaN(open)
           sma10.push parseFloat(data.sma10[i])
           sma20.push parseFloat(data.sma20[i])
           sma50.push parseFloat(data.sma50[i])

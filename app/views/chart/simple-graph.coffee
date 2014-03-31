@@ -53,8 +53,8 @@ module.exports = class SimpleGraph
     selected: null
 
     @line = d3.svg.line()
-        .x((d, i) => @x(i))
-        .y((d, i) => @y(d[@PCLOSE]))
+        .x((d, i) => @x i)
+        .y((d, i) => @y d[@PCLOSE])
 
     @onData()
 
@@ -162,9 +162,9 @@ module.exports = class SimpleGraph
         .attr("top", 0) .attr("left", 0) .attr("width", @size.width) .attr("height", @size.height)
         .attr("viewBox", "0 0 "+@size.width+" "+@size.height)
         .attr("class", "line")
-        .append("path")
-            .attr("class", "line")
-            .attr("d", @line(@pData))
+        # .append("path")
+        #     .attr("class", "line")
+        #     .attr("d", @line(@pData))
     
     # add Chart Title
     if (@options.title)
@@ -209,8 +209,11 @@ module.exports = class SimpleGraph
 
   update: () =>
     @dataRenderStage = null
-    lines = @vis.select("path").attr("d", @line(@pData));
-          
+    # lines = @vis.select("path").attr("d", @line(@pData));
+    # @drawCircle()
+    @drawCandle()
+
+  drawCircle: ->          
     circle = @vis.select("svg").selectAll(".datapoint")
         .data(@pData)
 
@@ -238,6 +241,68 @@ module.exports = class SimpleGraph
     if (d3.event && d3.event.keyCode) 
       d3.event.preventDefault()
       d3.event.stopPropagation()
+
+
+  allCandles: ->
+    @vis.select("svg").selectAll(".candle")
+
+  allStems: ->
+    @allCandles().selectAll("line")
+
+  allCandleStems: ->
+    @vis.select("svg").selectAll(".candle .stem")
+
+  allCandleBodies: ->
+    @vis.select("svg").selectAll(".candle .candle-body")
+
+  drawCandle: ->
+    dataCnt = @pData.length
+    cWidth = (@width / dataCnt) * 0.8
+    xOff = cWidth / 2
+
+    candle = @vis.select("svg").selectAll(".candle")
+        .data(@pData)
+
+    rectWidth = Math.abs(@x(1) - @x(0) ) * 0.6
+    rectHeightRatio = Math.abs(@y(1) - @y(0))
+    console.log "w/h #{rectWidth} #{rectHeightRatio}"
+
+    group = candle.enter().append("g")
+      .attr("class", "candle")
+    group.append("svg:line") 
+      .attr("class", (d) => if d[@POPEN] > d[@PCLOSE] then "stem price-down" else "stem price-up")
+      .attr("x1", (d, i) => 0).attr("y1", (d) => @y d[@PLOW])
+      .attr("x2", (d, i) => 0).attr("y2", (d) => @y d[@PHIGH])
+    group.append("svg:rect")
+      .attr("class", (d) => if d[@POPEN] > d[@PCLOSE] then "candle-body price-down" else "candle-body price-up")
+      .attr("y", (d) => @y(Math.max( d[@POPEN], d[@PCLOSE] )))
+      # .attr("height", (d) => @y(Math.abs(d[@POPEN] - d[@PCLOSE])))
+      
+          # .attr("x1", (d, i) => -0.4).attr("y1", (d) => 100)
+          # .attr("x2", (d, i) => 0.4).attr("y2", (d) => 160)
+          # .attr("stroke", (d) => if d[@POPEN] > d[@PCLOSE] then "red" else "blue")
+
+    # elems = @drawingArea.selectAll("line.stem")
+    #   .data(@priceData)
+    # stems = candle.selectAll("line .stem")
+    # stems.attr("class", (d) => if d[@POPEN] > d[@PCLOSE] then "price-down" else "price-up")
+    @allCandleStems() 
+        .attr("x1", (d, i) => 0).attr("y1", (d) => @y d[@PLOW])
+        .attr("x2", (d, i) => 0).attr("y2", (d) => @y d[@PHIGH])
+    @allCandleBodies()
+      .attr("y", (d) => @y(Math.max( d[@POPEN], d[@PCLOSE] )))
+      .attr("height", (d) => Math.abs(@y(d[@PCLOSE]) - @y(d[@POPEN])) or 0.5)
+      .attr("x", -rectWidth/2)
+      .attr("width", rectWidth)
+        # .attr("x1", (d, i) => -0.4).attr("y1", (d) => 100)
+        # .attr("x2", (d, i) => 0.4).attr("y2", (d) => 160)
+        # .attr("stroke", (d) => if d[@POPEN] > d[@PCLOSE] then "red" else "blue")
+    candle.exit().remove()
+
+    candle
+      .transition() 
+          .duration(100) 
+          .attr("transform", (d, i) => "translate(#{@x(i)}, 0)")
 
   datapointDrag: (d) =>
     registerKeyboardHandler(@keydown)

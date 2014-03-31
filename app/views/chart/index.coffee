@@ -33,10 +33,11 @@ module.exports = class ChartView extends View
     #   xlabel: "X Axis"
     #   ylabel: "Y Axis" 
     @priceData = new PriceData 
-      stkCode: "00123"
+      stkCode: @model.get('code')
     @priceData.doFetch().then =>
       console.log ".............. fetched"
       @candleGraph.onPriceData @priceData
+      @candleGraph.resetZoom()
 
   listen: 
     "change model" : "render"
