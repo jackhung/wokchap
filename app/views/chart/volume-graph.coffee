@@ -175,9 +175,10 @@ module.exports = class VolumeGraph extends ChartView
     console.debug "VolumeGraph#resetZoom .................#{@pData.length} ", @x.domain()
     @renderAxis()
 
-  zoomHandler: () =>
-    translate = d3.event.translate
-    scale = d3.event.scale
+  zoomHandler: (domain) =>
+    # translate = d3.event.translate
+    # scale = d3.event.scale
+    @x.domain(domain)
     @y.domain(@visibleYExtend()).nice()
     @renderAxis()
 

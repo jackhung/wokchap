@@ -123,7 +123,7 @@ module.exports = class BaseChart extends View
     gy.exit().remove();
 
     if @options.zoomable
-      @zoom = d3.behavior.zoom().x(@x).on("zoom", @zoomHandler)
+      @zoom = d3.behavior.zoom().x(@x).on("zoom", @zoomed)
       @plot.call(@zoom)
     @updateChart();
 
@@ -132,3 +132,6 @@ module.exports = class BaseChart extends View
 
   zoomHandler: ->
     console.error "Subclass should override zoomHandler()!!"
+
+  zoomed: () =>
+    @publishEvent "zoomed", @x.domain()

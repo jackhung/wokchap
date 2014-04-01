@@ -236,9 +236,11 @@ module.exports = class SimpleGraph extends ChartView
     @y.domain(@visibleYExtend()).nice()
     @renderAxis()
 
-  zoomHandler: () =>
-    translate = d3.event.translate
-    scale = d3.event.scale
+
+  zoomHandler: (domain) =>
+    # translate = d3.event.translate
+    # scale = d3.event.scale
+    @x.domain(domain)
     @y.domain(@visibleYExtend()).nice()
     @renderAxis()
 

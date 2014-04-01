@@ -36,6 +36,8 @@ module.exports = class ChartView extends View
       @volumeGraph.onPriceData @priceData
       @volumeGraph.resetZoom()
 
+    @subscribeEvent 'zoomed', @zoomed
+
   listen: 
     "change model" : "updateChart"
     # "sync model" : "updateChart"
@@ -46,6 +48,12 @@ module.exports = class ChartView extends View
     # @volumeGraph?.updateQuote attrs
     now = moment().format("hh:mm")
     $("#page-head-cotainer").html "#{attrs.close} #{attrs.ask} #{attrs.bid}<br> #{attrs.volume} #{now}"
+
+
+  zoomed: (domain) ->
+    console.debug "Somebody zoomed:", arguments
+    @candleGraph.zoomHandler domain
+    @volumeGraph.zoomHandler domain
 
   render: ->
     super
