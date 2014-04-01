@@ -1,14 +1,13 @@
-<h3>Chart: <%= @code %></h3>
 
 <div id='stock-info' code='<%= @code %>' >
 </div> 
 <div id='chart-container' class='row'>
 	<div id='candle-graph' class='chart col-md-11'>
 	</div>
+	<div id='volume-graph' class='chart col-md-11'>
+	</div>
 	<div id='indicator-graph' class='chart col-md-11'>
 		Indicator
 	</div>
-	<div id='volume-graph' class='chart col-md-11'>
-		Volume
-	</div>
+
 </div>

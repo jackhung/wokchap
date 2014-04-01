@@ -14,7 +14,9 @@ module.exports = class ChartController extends Controller
   show: (params) ->
     @model = new Book(code: params.code)
     @view = new ChartView( model: @model, containerMethod: "html" )
+    # @startTick()
 
+  startTick: ->
     @model.fetch().then =>
       console.debug "chart#fetched:", @model.attributes
       @ticker = setInterval =>

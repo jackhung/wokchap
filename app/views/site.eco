@@ -29,12 +29,14 @@
 	          </ul>
 	        </li>
 	      </ul>
-	      <form class="navbar-form navbar-left" role="search">
+<!-- 	      <form class="navbar-form navbar-left" role="search">
 	        <div class="form-group">
 	          <input type="text" class="form-control" placeholder="Search">
 	        </div>
 	        <button type="submit" class="btn btn-default">Submit</button>
-	      </form>
+	      </form> -->
+	      <div id="page-head-cotainer" class="navbar-text panel panel-default">
+	      </div>
 	      <ul class="nav navbar-nav navbar-right">
 	      	<li><a href="chart/00712">Chart</a></li>
 	        <li><a href="book/00712">00712</a></li>

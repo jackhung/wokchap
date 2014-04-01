@@ -1,17 +1,12 @@
 'use strict'
 
 ChartOptions = require 'views/chart/chart-options'
-# PriceService = require 'views/chart/stock-price-service'
 ChartView = require 'views/chart/base-chart'
 
-module.exports = class SimpleGraph extends ChartView
+module.exports = class VolumeGraph extends ChartView
 
   initialize: (options) ->
     super
-
-    @downy = Math.NaN;
-
-    dragged: null
     selected: null
 
   PDATE: 0
@@ -30,8 +25,8 @@ module.exports = class SimpleGraph extends ChartView
         .domain([0, @pData.length])
         .range([0, @size.width]);
 
-    @ymin = d3.min @pData, (d) => d[@PHIGH]
-    @ymax = d3.max @pData, (d) => d[@PLOW]
+    @ymin = d3.min @pData, (d) => d[@PVOL]
+    @ymax = d3.max @pData, (d) => d[@PVOL]
     # y-scale (inverted domain)
     @y = d3.scale.linear()
         .domain([@ymax, @ymin])
@@ -45,20 +40,7 @@ module.exports = class SimpleGraph extends ChartView
     unless @pData
       console.log "priceData is not ready when receiving rtquote"
       return
-    lastRecord = @pData[@pData.length - 1]
-    quoteDate = moment quote.date, "MM/DD/YYYY"
-    lastDate = moment lastRecord[0]
-    if quoteDate.isSame(lastDate)
-      lastRecord[1] = quote.open
-      lastRecord[2] = quote.high
-      lastRecord[3] = quote.low
-      lastRecord[4] = quote.close
-      lastRecord[5] = quote.volume
-    else
-      @pData.push [quoteDate, quote.open, quote.high, quote.low, quote.close, quote.volume]
     @resetZoom()
-
-    console.log "#{quoteDate.format('YYYY/MM/DD')} #{lastDate.format('YYYY/MM/DD')}"
 
   # ================================================================================
   plotArea: () ->
@@ -69,77 +51,33 @@ module.exports = class SimpleGraph extends ChartView
     d3.select('body').style("cursor", "move")
 
   updateChart: () =>
-    @drawCandle()
-
-  drawCircle: ->          
-    circle = @vis.select("svg").selectAll(".datapoint")
-        .data(@pData)
-
-    dataPoint = circle.enter().append("g")
-      .attr("class", "datapoint")
-      # .attr("transform", (d, i) => "translate(#{@x(i)},#{@y(d[@PCLOSE])})")
-
-    # circle.enter().append("circle")
-    dataPoint.append("circle")
-        .attr("class", (d) => if d is @selected then "selected" else null )
-        .attr("cx", 0.0 )
-        .attr("cy", 0.0 )
-        .attr("r", 3.0)
-        .style("cursor", "ns-resize")
-        .on("mousedown.drag",  @datapointDrag)
-        .on("touchstart.drag", @datapointDrag)
-
-    circle
-      .transition() 
-          .duration(300) 
-          .attr("transform", (d, i) => "translate(#{@x(i)}, #{@y(d[@PCLOSE])})")
-
-    circle.exit().remove();
-
-    if (d3.event && d3.event.keyCode) 
-      d3.event.preventDefault()
-      d3.event.stopPropagation()
+    @drawBar()
 
 
-  allCandles: ->
-    @vis.select("svg").selectAll(".candle")
+  drawBar: ->
+    rectWidth = Math.abs(@x(1) - @x(0) ) * 0.8
 
-  allStems: ->
-    @allCandles().selectAll("line")
-
-  allCandleStems: (topBottom = "top") ->
-    @vis.select("svg").selectAll(".candle .stem.#{topBottom}")
-
-  allCandleBodies: ->
-    @vis.select("svg").selectAll(".candle .candle-body")
-
-  drawCandle: ->
-    candle = @vis.select("svg").selectAll(".candle").data(@pData)
-
-    group = candle.enter().append("g") .attr("class", "candle")
-    group.append("svg:line") 
-      .attr("class", (d) => if d[@POPEN] > d[@PCLOSE] then "stem top price-down" else "stem top price-up")
-    group.append("svg:line") 
-      .attr("class", (d) => if d[@POPEN] > d[@PCLOSE] then "stem bottom price-down" else "stem bottom price-up")
-    group.append("svg:rect")
-      .attr("class", (d) => if d[@POPEN] > d[@PCLOSE] then "candle-body price-down" else "candle-body price-up")
-
-    @allCandleStems("top") .attr("x1", 0).attr("y1", (d) => @y d[@PHIGH])
-      .attr("x2", 0).attr("y2", (d) => @y(Math.max d[@POPEN], d[@PCLOSE]))
-    @allCandleStems("bottom") .attr("x1", 0).attr("y1", (d) => @y d[@PLOW])
-      .attr("x2", 0).attr("y2", (d) => @y(Math.min d[@POPEN], d[@PCLOSE]))
-
-    rectWidth = Math.abs(@x(1) - @x(0) ) * 0.6
-    # rectHeightRatio = Math.abs(@y(1) - @y(0))
-    @allCandleBodies()
-      .attr("y", (d) => @y(Math.max( d[@POPEN], d[@PCLOSE] )))
-      .attr("height", (d) => Math.abs(@y(d[@PCLOSE]) - @y(d[@POPEN])) or 0.5)
+    @bars = @vis.select("svg").selectAll(".volume-bar").data(@pData)
+    @bars
+      .enter().append("rect")
+      .attr("class", "volume-bar")
       .attr("x", -rectWidth/2)
+      .attr("y", (d) => @y( d[@PVOL]))
       .attr("width", rectWidth)
-
-    candle.exit().remove()
-
-    candle .transition() .duration(100) .attr("transform", (d, i) => "translate(#{@x(i)}, 0)")
+      .attr "height", (d, i) => 
+        @size.height - @y(d[@PVOL])
+      .classed("down", (d) => d[@PCLOSE] < d[@POPEN])
+      .on("mouseover", (d,i) -> console.log "#{i}: ", d)
+    @bars.selectAll(".volume-bar")
+      .attr("x", -rectWidth/2)
+      .attr("y", (d) => @y( d[@PVOL]))
+      .attr("width", rectWidth)
+      .attr "height", (d, i) => 
+        @size.height - @y(d[@PVOL])
+      .classed("down", (d) => d[@PCLOSE] < d[@POPEN])
+      .on("mouseover", (d,i) -> console.log "#{i}: ", d)
+    @bars.exit().remove()
+    @bars .transition() .duration(100) .attr("transform", (d, i) => "translate(#{@x(i)}, 0)")
 
   datapointDrag: (d) =>
     registerKeyboardHandler(@keydown)
@@ -234,6 +172,7 @@ module.exports = class SimpleGraph extends ChartView
     x0 = Math.max @pData.length - @pData.length * (p / @pData.length), 60
     @x.domain([x0, @pData.length])
     @y.domain(@visibleYExtend()).nice()
+    console.debug "VolumeGraph#resetZoom .................#{@pData.length} ", @x.domain()
     @renderAxis()
 
   zoomHandler: () =>
@@ -245,6 +184,9 @@ module.exports = class SimpleGraph extends ChartView
   getDataIndex: (cx) ->
     Math.floor(@x.invert(cx) + 0.5)
 
+  yAxisLabel: () =>
+    (d) => f = d3.formatPrefix(d); "#{f.scale(d)}#{f.symbol}"
+
   visibleYExtend: -> 
     [first, last] = @x.domain()
     first = Math.floor first
@@ -254,11 +196,10 @@ module.exports = class SimpleGraph extends ChartView
 
     ylow = Number.MAX_VALUE
     yhigh = Number.MIN_VALUE
-    console.log "SimpleGraph#visibleYExtend ----------- #{first} ... #{last}"
     for i in [first...last]
       d = @pData[i]
-      ylow = d[@PLOW] if d[@PLOW] < ylow
-      yhigh = d[@PHIGH] if d[@PHIGH] > yhigh
+      ylow = d[@PVOL] if d[@PVOL] < ylow
+      yhigh = d[@PVOL] if d[@PVOL] > yhigh
     console.log "#{first} .. #{last} max, min { #{yhigh} #{ylow}"
     [yhigh * 1.05 , ylow * 0.95 ] # NOTE: inverted order max, min!
 

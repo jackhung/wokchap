@@ -2,7 +2,8 @@
 
 View = require('views/base/view')
 SimpleGraph = require "views/chart/simple-graph"
-SimpleGraphOrig = require "views/chart/js-simple-graph"
+VolumeGraph = require "views/chart/volume-graph"
+# SimpleGraphOrig = require "views/chart/js-simple-graph"
 PriceData = require "views/chart/stock-price-service"
 
 module.exports = class ChartView extends View
@@ -17,9 +18,14 @@ module.exports = class ChartView extends View
     super
     console.log "ChartView#initialize ... #{@model.get('code')}"
 
-  createCandleGraph: =>
+  createGraphs: =>
     console.debug "ChartView#createCandleGraph: ", $('#candle-graph')
-    @candleGraph = new SimpleGraph 'candle-graph',
+    @candleGraph = new SimpleGraph
+      el: '#candle-graph' 
+
+    @volumeGraph = new VolumeGraph
+      el: '#volume-graph'
+      # zoomable: false
 
     @priceData = new PriceData 
       stkCode: @model.get('code')
@@ -27,18 +33,24 @@ module.exports = class ChartView extends View
       console.log ".............. fetched"
       @candleGraph.onPriceData @priceData
       @candleGraph.resetZoom()
+      @volumeGraph.onPriceData @priceData
+      @volumeGraph.resetZoom()
 
   listen: 
     "change model" : "updateChart"
     # "sync model" : "updateChart"
 
   updateChart: ->
-    @candleGraph?.updateQuote @model.attributes
+    attrs = @model.attributes
+    @candleGraph?.updateQuote attrs
+    # @volumeGraph?.updateQuote attrs
+    now = moment().format("hh:mm")
+    $("#page-head-cotainer").html "#{attrs.close} #{attrs.ask} #{attrs.bid}<br> #{attrs.volume} #{now}"
 
   render: ->
     super
     console.debug @model.attributes, @candleGraph
-    _.defer @createCandleGraph unless @candleGraph
+    _.defer @createGraphs unless @candleGraph
 
   dispose: ->
     console.log "ChartView#dispose"
