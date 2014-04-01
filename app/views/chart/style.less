@@ -17,10 +17,10 @@
 }
 
 .price-up {
-	stroke: blue;
+	stroke: #44F;
 }
 .price-down {
-	stroke: red;
+	stroke: #F44;
 }
 .plot-background rect {
 	fill: #FFF;
@@ -29,9 +29,17 @@ rect.candle-box {
   fill: #BBF;
   opacity: 0.6;
 }
+rect.volume-bar {
+	stroke: #88F;
+	fill: #88F;
+}
 rect.candle-box.down, rect.volume-bar.down {
   stroke: #F88;
 }
+rect.volume-bar.down {
+	fill: #F88;
+}
+
 .candle .stem , .candle-body {
 	stroke-width: 1px;
 }

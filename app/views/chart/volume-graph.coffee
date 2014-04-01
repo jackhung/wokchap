@@ -55,7 +55,7 @@ module.exports = class VolumeGraph extends ChartView
 
 
   drawBar: ->
-    rectWidth = Math.abs(@x(1) - @x(0) ) * 0.8
+    rectWidth = Math.abs(@x(1) - @x(0) ) * 0.6
 
     @bars = @vis.select("svg").selectAll(".volume-bar").data(@pData)
     @bars
@@ -68,14 +68,13 @@ module.exports = class VolumeGraph extends ChartView
         @size.height - @y(d[@PVOL])
       .classed("down", (d) => d[@PCLOSE] < d[@POPEN])
       .on("mouseover", (d,i) -> console.log "#{i}: ", d)
-    @bars.selectAll(".volume-bar")
+    @bars
       .attr("x", -rectWidth/2)
       .attr("y", (d) => @y( d[@PVOL]))
       .attr("width", rectWidth)
       .attr "height", (d, i) => 
         @size.height - @y(d[@PVOL])
-      .classed("down", (d) => d[@PCLOSE] < d[@POPEN])
-      .on("mouseover", (d,i) -> console.log "#{i}: ", d)
+
     @bars.exit().remove()
     @bars .transition() .duration(100) .attr("transform", (d, i) => "translate(#{@x(i)}, 0)")
 
@@ -175,12 +174,6 @@ module.exports = class VolumeGraph extends ChartView
     console.debug "VolumeGraph#resetZoom .................#{@pData.length} ", @x.domain()
     @renderAxis()
 
-  zoomHandler: (domain) =>
-    # translate = d3.event.translate
-    # scale = d3.event.scale
-    @x.domain(domain)
-    @y.domain(@visibleYExtend()).nice()
-    @renderAxis()
 
   getDataIndex: (cx) ->
     Math.floor(@x.invert(cx) + 0.5)

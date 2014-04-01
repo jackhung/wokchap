@@ -112,8 +112,8 @@ module.exports = class BaseChart extends View
     gye = gy.enter().insert("g", "a") .attr("class", "y") .attr("transform", ty) .attr("background-fill", "#FFEEB6")
     gye.append("line") .attr("stroke", stroke) .attr("x1", 0) .attr("x2", @size.width)
     gye.append("text") .attr("class", "axis")
-        .attr("x", @size.width + 20) .attr("dy", ".35em")
-        .attr("text-anchor", "end")
+        .attr("x", @size.width + 2) .attr("dy", ".35em")
+        # .attr("text-anchor", "end")
         .text(@yAxisLabel())
         .style("cursor", "ns-resize")
         .on("mouseover", (d) -> d3.select(this).style("font-weight", "bold"))
@@ -130,8 +130,12 @@ module.exports = class BaseChart extends View
   yAxisLabel: =>
     @y.tickFormat(10)
 
-  zoomHandler: ->
-    console.error "Subclass should override zoomHandler()!!"
+  zoomHandler: (domain) =>
+    # translate = d3.event.translate
+    # scale = d3.event.scale
+    @x.domain(domain)
+    @y.domain(@visibleYExtend()).nice()
+    @renderAxis()
 
   zoomed: () =>
     @publishEvent "zoomed", @x.domain()

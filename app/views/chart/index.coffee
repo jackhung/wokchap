@@ -25,7 +25,8 @@ module.exports = class ChartView extends View
 
     @volumeGraph = new VolumeGraph
       el: '#volume-graph'
-      # zoomable: false
+      xaxis: false
+      zoomable: false
 
     @priceData = new PriceData 
       stkCode: @model.get('code')
@@ -45,7 +46,7 @@ module.exports = class ChartView extends View
   updateChart: ->
     attrs = @model.attributes
     @candleGraph?.updateQuote attrs
-    # @volumeGraph?.updateQuote attrs
+    @volumeGraph?.updateQuote attrs
     now = moment().format("hh:mm")
     $("#page-head-cotainer").html "#{attrs.close} #{attrs.ask} #{attrs.bid}<br> #{attrs.volume} #{now}"
 

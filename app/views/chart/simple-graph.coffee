@@ -236,14 +236,6 @@ module.exports = class SimpleGraph extends ChartView
     @y.domain(@visibleYExtend()).nice()
     @renderAxis()
 
-
-  zoomHandler: (domain) =>
-    # translate = d3.event.translate
-    # scale = d3.event.scale
-    @x.domain(domain)
-    @y.domain(@visibleYExtend()).nice()
-    @renderAxis()
-
   getDataIndex: (cx) ->
     Math.floor(@x.invert(cx) + 0.5)
 
@@ -256,12 +248,12 @@ module.exports = class SimpleGraph extends ChartView
 
     ylow = Number.MAX_VALUE
     yhigh = Number.MIN_VALUE
-    console.log "SimpleGraph#visibleYExtend ----------- #{first} ... #{last}"
+
     for i in [first...last]
       d = @pData[i]
       ylow = d[@PLOW] if d[@PLOW] < ylow
       yhigh = d[@PHIGH] if d[@PHIGH] > yhigh
-    console.log "#{first} .. #{last} max, min { #{yhigh} #{ylow}"
+
     [yhigh * 1.05 , ylow * 0.95 ] # NOTE: inverted order max, min!
 
 registerKeyboardHandler = (callback) ->
