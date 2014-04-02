@@ -82,7 +82,7 @@ module.exports = class VolumeGraph extends ChartView
       d = @pData[i]
       ylow = d[@PVOL] if d[@PVOL] < ylow
       yhigh = d[@PVOL] if d[@PVOL] > yhigh
-    [yhigh, ylow] # NOTE: inverted order max, min!
+    [yhigh * 1.01, ylow * 0.99] # NOTE: inverted order max, min!
 
 # registerKeyboardHandler = (callback) ->
 #   callback = callback

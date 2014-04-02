@@ -68,6 +68,14 @@ module.exports = class BaseChart extends View
     if @plot_drag?
       @plot.on("mousedown.drag", @plot_drag).on("touchstart.drag", @plot_drag)
 
+    if @doHit?
+      @plot.on "mousemove", () =>
+        return unless @x
+        p = d3.mouse @plotArea()
+        x = @x.invert p[0]
+        rx = Math.round x
+        @doHit rx, Math.abs(x - rx)
+
     # the line path, class='line'
     @vis.append("svg")
         .attr("top", 0) .attr("left", 0) .attr("width", @size.width) .attr("height", @size.height)

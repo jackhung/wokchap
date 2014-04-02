@@ -61,7 +61,7 @@ module.exports = class ChartView extends View
 
 
   zoomed: (domain) ->
-    console.debug "Somebody zoomed:", arguments
+    @dataLength = @priceData.get("priceData").length
     if domain[1] > @dataLength
       domain[1] = @dataLength
     @candleGraph.zoomHandler domain

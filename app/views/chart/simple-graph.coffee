@@ -119,6 +119,19 @@ module.exports = class SimpleGraph extends ChartView
   #   @selected = @dragged = d
   #   @updateChart()
 
+  $hitX: null
+
+  doHit: (x, distant) =>
+    if distant < 0.3
+      $candle = d3.select( d3.selectAll(".candle")[0][x] )
+      if $candle
+        @$hitX?.classed "hit", false
+        @$hitX = $candle
+        $candle.classed "hit", true
+    else
+      @$hitX?.classed "hit", false
+      @$hitX = null
+
   keydown: () =>
     return if not @selected
     switch (d3.event.keyCode)
