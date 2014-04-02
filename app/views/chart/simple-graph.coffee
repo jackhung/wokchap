@@ -41,32 +41,11 @@ module.exports = class SimpleGraph extends ChartView
     # @initChartElements()
     @renderAxis()
 
-  updateQuote: (quote) ->
-    unless @pData
-      console.log "priceData is not ready when receiving rtquote"
-      return
-    lastRecord = @pData[@pData.length - 1]
-    quoteDate = moment quote.date, "MM/DD/YYYY"
-    lastDate = moment lastRecord[0]
-    if quoteDate.isSame(lastDate)
-      lastRecord[1] = quote.open
-      lastRecord[2] = quote.high
-      lastRecord[3] = quote.low
-      lastRecord[4] = quote.close
-      lastRecord[5] = quote.volume
-    else
-      @pData.push [quoteDate, quote.open, quote.high, quote.low, quote.close, quote.volume]
-    @resetZoom()
+  # ===============================================================================
 
-    console.log "#{quoteDate.format('YYYY/MM/DD')} #{lastDate.format('YYYY/MM/DD')}"
-
-  # ================================================================================
-  plotArea: () ->
-    @vis.node() #@vis[0][0]
-
-  plot_drag: () =>
-    registerKeyboardHandler(@keydown)
-    d3.select('body').style("cursor", "move")
+  # plot_drag: () =>
+  #   registerKeyboardHandler(@keydown)
+  #   d3.select('body').style("cursor", "move")
 
   updateChart: () =>
     @drawCandle()
@@ -230,12 +209,6 @@ module.exports = class SimpleGraph extends ChartView
     p = d3.mouse @plotArea()
     @downy = @y.invert(p[1]);
 
-  resetZoom: (p = 150) =>
-    x0 = Math.max @pData.length - @pData.length * (p / @pData.length), 60
-    @x.domain([x0, @pData.length])
-    @y.domain(@visibleYExtend()).nice()
-    @renderAxis()
-
   getDataIndex: (cx) ->
     Math.floor(@x.invert(cx) + 0.5)
 
@@ -254,7 +227,7 @@ module.exports = class SimpleGraph extends ChartView
       ylow = d[@PLOW] if d[@PLOW] < ylow
       yhigh = d[@PHIGH] if d[@PHIGH] > yhigh
 
-    [yhigh * 1.05 , ylow * 0.95 ] # NOTE: inverted order max, min!
+    [yhigh, ylow ] # NOTE: inverted order max, min!
 
 registerKeyboardHandler = (callback) ->
   callback = callback

@@ -30,12 +30,18 @@ module.exports = class ChartView extends View
 
     @priceData = new PriceData 
       stkCode: @model.get('code')
+
     @priceData.doFetch().then =>
       console.log ".............. fetched"
+      @dataLength = @priceData.get("priceData").length
       @candleGraph.onPriceData @priceData
       @candleGraph.resetZoom()
       @volumeGraph.onPriceData @priceData
       @volumeGraph.resetZoom()
+
+      @listenTo @priceData, "change", =>
+        @candleGraph.resetZoom()
+        @volumeGraph.resetZoom()
 
     @subscribeEvent 'zoomed', @zoomed
 
@@ -45,14 +51,19 @@ module.exports = class ChartView extends View
 
   updateChart: ->
     attrs = @model.attributes
-    @candleGraph?.updateQuote attrs
-    @volumeGraph?.updateQuote attrs
+    @priceData.addOrUpdateQuote attrs
+    # @candleGraph?.updateQuote attrs
+    # @volumeGraph?.updateQuote attrs
     now = moment().format("hh:mm")
-    $("#page-head-cotainer").html "#{attrs.close} #{attrs.ask} #{attrs.bid}<br> #{attrs.volume} #{now}"
+    f = d3.formatPrefix(attrs.volume)
+    vol = "#{f.scale(attrs.volume)}#{f.symbol}"
+    $("#page-head-cotainer").html "#{attrs.close} #{attrs.ask} #{attrs.bid}<br> #{vol} #{now}"
 
 
   zoomed: (domain) ->
     console.debug "Somebody zoomed:", arguments
+    if domain[1] > @dataLength
+      domain[1] = @dataLength
     @candleGraph.zoomHandler domain
     @volumeGraph.zoomHandler domain
 

@@ -1,5 +1,9 @@
 View = require 'views/base/view'
 
+###
+  subclassing BaseChart
+  * define a 'plot_drag' to enable dragging (enable modification of point in original example)
+###
 module.exports = class BaseChart extends View
 
   defaults:
@@ -15,10 +19,10 @@ module.exports = class BaseChart extends View
     _.extend @options, @defaults, options
 
     @padding = 
-      top:    if @options.title  then 40 else 5
-      right:                 30
-      bottom: if @options.xlabel then 60 else 35
-      left:   if @options.ylabel then 70 else 45
+      top:    if @options.title  then 40 else 3
+      right:                 35
+      bottom: if @options.xaxis && @options.xlabel then 60 else if @options.xaxis then 10 else 3
+      left:   if @options.ylabel then 70 else 20
 
     @options.zoomable = true unless @options.zoomable?
 
@@ -46,10 +50,10 @@ module.exports = class BaseChart extends View
 
     # plot: the plot area for the data
     @plot = @vis.append("rect") .attr("width", @size.width) .attr("height", @size.height)
-        .style("fill", "none")
-        .attr("pointer-events", "all")
-        .on("mousedown.drag", @plot_drag)
-        .on("touchstart.drag", @plot_drag)
+      .style("fill", "none")
+      .attr("pointer-events", "all")
+    if @plot_drag?
+      @plot.on("mousedown.drag", @plot_drag).on("touchstart.drag", @plot_drag)
 
     # the line path, class='line'
     @vis.append("svg")
@@ -127,6 +131,9 @@ module.exports = class BaseChart extends View
       @plot.call(@zoom)
     @updateChart();
 
+  plotArea: () ->
+    @vis.node() #@vis[0][0]
+
   yAxisLabel: =>
     @y.tickFormat(10)
 
@@ -139,3 +146,9 @@ module.exports = class BaseChart extends View
 
   zoomed: () =>
     @publishEvent "zoomed", @x.domain()
+
+  resetZoom: (p = 150) =>
+    x0 = Math.max @pData.length - @pData.length * (p / @pData.length), 60
+    @x.domain([x0, @pData.length])
+    @y.domain(@visibleYExtend()).nice()
+    @renderAxis()

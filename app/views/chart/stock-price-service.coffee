@@ -137,12 +137,29 @@ module.exports = class PriceService extends Backbone.Model
     if not attrPriceData  # no priceData
       return
     lastPriceData = attrPriceData.last()
-    date = new Date(priceData[0])
-    lastDate = new Date(lastPriceData[0])
-    if date.isSameDate(lastDate)
+    date = moment(priceData[0], "MM/DD/YYYY")
+    lastDate = lastPriceData[0]
+    if date.isSame(lastDate)
       attrPriceData[attrPriceData.length - 1] = priceData
     else
       @get("priceData").push(priceData)
+    @trigger("change")
+
+  addOrUpdateQuote: (quote) ->
+    attrPriceData = @get("priceData")
+    if not attrPriceData  # no priceData
+      return
+    lastRecord = attrPriceData[attrPriceData.length - 1]
+    quoteDate = moment quote.date, "MM/DD/YYYY"
+    lastDate = moment lastRecord[0]
+    if quoteDate.isSame(lastDate)
+      lastRecord[1] = quote.open
+      lastRecord[2] = quote.high
+      lastRecord[3] = quote.low
+      lastRecord[4] = quote.close
+      lastRecord[5] = quote.volume
+    else
+      @get("priceData").push [quoteDate, quote.open, quote.high, quote.low, quote.close, quote.volume]
     @trigger("change")
 
   getPriceData: ->

@@ -36,23 +36,10 @@ module.exports = class VolumeGraph extends ChartView
     # @initChartElements()
     @renderAxis()
 
-  updateQuote: (quote) ->
-    unless @pData
-      console.log "priceData is not ready when receiving rtquote"
-      return
-    @resetZoom()
-
   # ================================================================================
-  plotArea: () ->
-    @vis.node() #@vis[0][0]
-
-  plot_drag: () =>
-    registerKeyboardHandler(@keydown)
-    d3.select('body').style("cursor", "move")
 
   updateChart: () =>
     @drawBar()
-
 
   drawBar: ->
     rectWidth = Math.abs(@x(1) - @x(0) ) * 0.6
@@ -78,19 +65,9 @@ module.exports = class VolumeGraph extends ChartView
     @bars.exit().remove()
     @bars .transition() .duration(100) .attr("transform", (d, i) => "translate(#{@x(i)}, 0)")
 
-  datapointDrag: (d) =>
-    registerKeyboardHandler(@keydown)
-    document.onselectstart = () -> return false
-    @selected = @dragged = d
-    @updateChart()
-
   mousemove: () =>
     p = d3.mouse @plotArea() 
     t = d3.event.changedTouches
-    
-    if (@dragged)
-      @dragged.y = @y.invert(Math.max(0, Math.min(@size.height, p[1])));
-      @updateChart();
     
     if (!isNaN(@downx)) 
       d3.select('body').style("cursor", "ew-resize");
@@ -141,22 +118,6 @@ module.exports = class VolumeGraph extends ChartView
       d3.event.preventDefault();
       d3.event.stopPropagation();
 
-    if (@dragged) 
-      @dragged = null 
-
-  keydown: () =>
-    return if not @selected
-    switch (d3.event.keyCode)
-      when 8, 46   # delete
-        i = @points.indexOf(@selected)
-        @points.splice(i, 1);
-        # self.selected = self.points.length ? self.points[i > 0 ? i - 1 : 0] : null;
-        @selected = if @points.length
-          if i > 0 then @points[i - 1] else @points[0]
-        else
-          null
-        @updateChart();
-        
   xaxis_drag: () =>
     document.onselectstart = () -> false
     p = d3.mouse @plotArea()
@@ -166,14 +127,6 @@ module.exports = class VolumeGraph extends ChartView
     document.onselectstart = () -> false
     p = d3.mouse @plotArea()
     @downy = @y.invert(p[1]);
-
-  resetZoom: (p = 150) =>
-    x0 = Math.max @pData.length - @pData.length * (p / @pData.length), 60
-    @x.domain([x0, @pData.length])
-    @y.domain(@visibleYExtend()).nice()
-    console.debug "VolumeGraph#resetZoom .................#{@pData.length} ", @x.domain()
-    @renderAxis()
-
 
   getDataIndex: (cx) ->
     Math.floor(@x.invert(cx) + 0.5)
