@@ -2,9 +2,20 @@ View = require 'views/base/view'
 
 ###
   subclassing BaseChart
-  * define a 'plot_drag' to enable dragging (enable modification of point in original example)
+  * plot_drag :  to enable dragging (enable modification of point in original example)
+  * [x/y]axis_drag : to handle axis dradding
+  * mouse move on canvas (change point value and axis-drag)
+    * mousemove : handle mousemove.drag and touchmove.drag
+    * mouseup : handle mouseup.drag and touchend.drag
 ###
 module.exports = class BaseChart extends View
+
+  PDATE: 0
+  POPEN: 1
+  PHIGH: 2
+  PLOW: 3
+  PCLOSE: 4
+  PVOL: 5
 
   defaults:
     xaxis: true
@@ -31,6 +42,8 @@ module.exports = class BaseChart extends View
       "height": @cy - @padding.top  - @padding.bottom
     };
 
+    @downx = Math.NaN
+    @downy = Math.NaN
     @initChartElements()
 
   initChartElements: () ->
@@ -98,13 +111,14 @@ module.exports = class BaseChart extends View
     gxe = gx.enter().insert("g", "a") .attr("class", "x") .attr("transform", tx)
     gxe.append("line") .attr("stroke", stroke) .attr("y1", 0) .attr("y2", @size.height)
     if @options.xaxis
-      gxe.append("text") .attr("class", "axis")
-          .attr("y", @size.height) .attr("dy", "1em")
-          .attr("text-anchor", "middle")
-          .text(xtext)
-          .style("cursor", "ew-resize")
-          .on("mouseover", (d) -> d3.select(this).style("font-weight", "bold"))
-          .on("mouseout",  (d) -> d3.select(this).style("font-weight", "normal"))
+      text = gxe.append("text") .attr("class", "axis")
+        .attr("y", @size.height) .attr("dy", "1em")
+        .attr("text-anchor", "middle")
+        .text(xtext)
+        .on("mouseover", (d) -> d3.select(this).style("font-weight", "bold"))
+        .on("mouseout",  (d) -> d3.select(this).style("font-weight", "normal"))
+      if @xaxis_drag?
+        text.style("cursor", "ew-resize")
           .on("mousedown.drag",  @xaxis_drag)
           .on("touchstart.drag", @xaxis_drag);
       gx.select("text") .text(xtext)
@@ -152,3 +166,68 @@ module.exports = class BaseChart extends View
     @x.domain([x0, @pData.length])
     @y.domain(@visibleYExtend()).nice()
     @renderAxis()
+
+  mousemove: () =>
+    p = d3.mouse @plotArea() 
+    # t = d3.event.changedTouches
+    
+    if (@dragged)
+      @dragged.y = @y.invert(Math.max(0, Math.min(@size.height, p[1])));
+      @updateChart();
+
+    @_xAxisDragged(p)
+    @_yAxisDragged(p)
+
+  mouseup: () =>
+    document.onselectstart = () -> return true
+    d3.select('body').style("cursor", "auto");
+    if (!isNaN(@downx))
+      @renderAxis();
+      @downx = Math.NaN;
+      d3.event.preventDefault();
+      d3.event.stopPropagation();
+
+    if (!isNaN(@downy)) 
+      @renderAxis();
+      @downy = Math.NaN;
+      d3.event.preventDefault();
+      d3.event.stopPropagation();
+
+    if (@dragged) 
+      @dragged = null 
+
+  _xAxisDragged: (p) ->
+    if (!isNaN(@downx)) 
+      d3.select('body').style("cursor", "ew-resize");
+      rupx = @x.invert(p[0])
+      [xaxis1, xaxis2] = @x.domain()
+      xaxis1 = 0 if (xaxis1 < 0)
+      xaxis2 = @pData.length if xaxis2 >= @pData.length
+      xextent = xaxis2 - xaxis1
+      if (xextent < 30)
+        xextent = 30
+      if (rupx != 0)
+        #changex = @downx / rupx; ?? avoid negative x? need to varify
+        changex = (@downx - xaxis1) / (rupx - xaxis1);
+        new_domain = [xaxis1, xaxis1 + (xextent * changex)]
+        @x.domain(new_domain);
+        @renderAxis();
+    
+      d3.event.preventDefault();
+      d3.event.stopPropagation();
+    
+  _yAxisDragged: (p) ->
+    if (!isNaN(@downy)) 
+      d3.select('body').style("cursor", "ns-resize");
+      rupy = @y.invert(p[1])
+      yaxis1 = @y.domain()[1]
+      yaxis2 = @y.domain()[0]
+      yextent = yaxis2 - yaxis1
+      if (rupy != 0) 
+        changey = @downy / rupy;
+        new_domain = [yaxis1 + (yextent * changey), yaxis1];
+        @y.domain(new_domain);
+        @renderAxis();
+      
+      d3.event.preventDefault();
+      d3.event.stopPropagation();

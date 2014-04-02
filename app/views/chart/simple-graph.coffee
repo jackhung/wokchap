@@ -14,13 +14,6 @@ module.exports = class SimpleGraph extends ChartView
     dragged: null
     selected: null
 
-  PDATE: 0
-  POPEN: 1
-  PHIGH: 2
-  PLOW: 3
-  PCLOSE: 4
-  PVOL: 5
-
   # Real Stock Data ==============================================================
   onPriceData: (priceData) =>
     @model = priceData
@@ -43,9 +36,9 @@ module.exports = class SimpleGraph extends ChartView
 
   # ===============================================================================
 
-  # plot_drag: () =>
-  #   registerKeyboardHandler(@keydown)
-  #   d3.select('body').style("cursor", "move")
+  plot_drag: () =>
+    registerKeyboardHandler(@keydown)
+    d3.select('body').style("cursor", "move")
 
   updateChart: () =>
     @drawCandle()
@@ -65,8 +58,8 @@ module.exports = class SimpleGraph extends ChartView
         .attr("cy", 0.0 )
         .attr("r", 3.0)
         .style("cursor", "ns-resize")
-        .on("mousedown.drag",  @datapointDrag)
-        .on("touchstart.drag", @datapointDrag)
+        # .on("mousedown.drag",  @datapointDrag)
+        # .on("touchstart.drag", @datapointDrag)
 
     circle
       .transition() 
@@ -120,71 +113,11 @@ module.exports = class SimpleGraph extends ChartView
 
     candle .transition() .duration(100) .attr("transform", (d, i) => "translate(#{@x(i)}, 0)")
 
-  datapointDrag: (d) =>
-    registerKeyboardHandler(@keydown)
-    document.onselectstart = () -> return false
-    @selected = @dragged = d
-    @updateChart()
-
-  mousemove: () =>
-    p = d3.mouse @plotArea() 
-    t = d3.event.changedTouches
-    
-    if (@dragged)
-      @dragged.y = @y.invert(Math.max(0, Math.min(@size.height, p[1])));
-      @updateChart();
-    
-    if (!isNaN(@downx)) 
-      d3.select('body').style("cursor", "ew-resize");
-      rupx = @x.invert(p[0])
-      [xaxis1, xaxis2] = @x.domain()
-      xaxis1 = 0 if (xaxis1 < 0)
-      xaxis2 = @pData.length if xaxis2 >= @pData.length
-      xextent = xaxis2 - xaxis1
-      if (xextent < 30)
-        xextent = 30
-      if (rupx != 0)
-        #changex = @downx / rupx; ?? avoid negative x? need to varify
-        changex = (@downx - xaxis1) / (rupx - xaxis1);
-        new_domain = [xaxis1, xaxis1 + (xextent * changex)]
-        @x.domain(new_domain);
-        @renderAxis();
-  
-      d3.event.preventDefault();
-      d3.event.stopPropagation();
-    
-    if (!isNaN(@downy)) 
-      d3.select('body').style("cursor", "ns-resize");
-      rupy = @y.invert(p[1])
-      yaxis1 = @y.domain()[1]
-      yaxis2 = @y.domain()[0]
-      yextent = yaxis2 - yaxis1
-      if (rupy != 0) 
-        changey = @downy / rupy;
-        new_domain = [yaxis1 + (yextent * changey), yaxis1];
-        @y.domain(new_domain);
-        @renderAxis();
-      
-      d3.event.preventDefault();
-      d3.event.stopPropagation();
-
-  mouseup: () =>
-    document.onselectstart = () -> return true
-    d3.select('body').style("cursor", "auto");
-    if (!isNaN(@downx))
-      @renderAxis();
-      @downx = Math.NaN;
-      d3.event.preventDefault();
-      d3.event.stopPropagation();
-
-    if (!isNaN(@downy)) 
-      @renderAxis();
-      @downy = Math.NaN;
-      d3.event.preventDefault();
-      d3.event.stopPropagation();
-
-    if (@dragged) 
-      @dragged = null 
+  # datapointDrag: (d) =>
+  #   registerKeyboardHandler(@keydown)
+  #   document.onselectstart = () -> return false
+  #   @selected = @dragged = d
+  #   @updateChart()
 
   keydown: () =>
     return if not @selected
