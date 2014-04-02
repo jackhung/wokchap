@@ -20,16 +20,17 @@ module.exports = class ChartView extends View
 
   createGraphs: =>
     console.debug "ChartView#createCandleGraph: ", $('#candle-graph')
+    @priceData = new PriceData 
+      stkCode: @model.get('code')
+
     @candleGraph = new SimpleGraph
       el: '#candle-graph' 
+      model: @priceData
 
     @volumeGraph = new VolumeGraph
       el: '#volume-graph'
       xaxis: false
       zoomable: false
-
-    @priceData = new PriceData 
-      stkCode: @model.get('code')
 
     @priceData.doFetch().then =>
       console.log ".............. fetched"
@@ -43,6 +44,8 @@ module.exports = class ChartView extends View
         @candleGraph.resetZoom()
         @volumeGraph.resetZoom()
 
+      @listenTo @priceData, "change:signalHist", -> console.log "signal history ready ............" 
+      # @listenTo @priceData, "change:dailySignals", -> console.log "daily signal ready ............" 
     @subscribeEvent 'zoomed', @zoomed
 
   listen: 

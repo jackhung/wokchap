@@ -14,6 +14,9 @@ module.exports = class SimpleGraph extends ChartView
     dragged: null
     selected: null
 
+  listen:
+    "change:signalHist model" : "drawSignals"
+
   # Real Stock Data ==============================================================
   onPriceData: (priceData) =>
     @model = priceData
@@ -42,6 +45,7 @@ module.exports = class SimpleGraph extends ChartView
 
   updateChart: () =>
     @drawCandle()
+    @drawSignals()
 
   drawCircle: ->          
     circle = @vis.select("svg").selectAll(".datapoint")
@@ -72,6 +76,30 @@ module.exports = class SimpleGraph extends ChartView
       d3.event.preventDefault()
       d3.event.stopPropagation()
 
+  drawSignals: () ->
+    # dataCnt = @priceData.length
+    # size = (@width / dataCnt) * 1.8
+    signalData = @model.get "signalHist"
+    return unless signalData
+    size = Math.abs(@x(1) - @x(0) ) * 1.2
+    dx = 0 #size / 2
+    buySymbol = d3.svg.symbol().type("triangle-up").size(size)
+    sellSymbol = d3.svg.symbol().type("triangle-down").size(size)
+
+    self = @
+    signals = @vis.select("svg").selectAll(".signal").data(signalData)
+
+    signals
+      .enter().append("path").attr("class", "signal")
+      .classed("buy", (d) -> d.hist.buySell is "B")
+      .attr("d", (d) -> if d.hist.buySell is "B" then buySymbol(d) else sellSymbol(d))
+      .attr("transform", (d) -> "translate(#{self.x(d.x) + dx}, #{self.y(d.hist.price)})")
+
+    signals
+      .attr("d", (d) -> if d.hist.buySell is "B" then buySymbol(d) else sellSymbol(d))
+      .attr("transform", (d) -> "translate(#{self.x(d.x) + dx}, #{self.y(d.hist.price)})")
+
+    signals.exit().remove()
 
   allCandles: ->
     @vis.select("svg").selectAll(".candle")

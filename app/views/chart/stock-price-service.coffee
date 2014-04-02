@@ -91,7 +91,23 @@ module.exports = class PriceService extends Backbone.Model
           good = signal[3]
           ret = parseFloat(signal[4].replace(/,/g, ''))
           [d.toString(), p, buySell, good, ret]
-        @set('signalHist', signals.reverse())
+
+
+        hist = for sh in signals.reverse() # date, price, B/S, flag, culmulative return
+          {date: moment(sh[0]), price: sh[1], buySell: sh[2], flag: sh[3], cRet: sh[4]}
+
+        priceData = @getPriceData()
+        idx = 0
+        for h, i in hist # map the date to x-index in priceData's date
+          while idx < priceData.length and not h.date.isBefore(moment priceData[idx][0])
+            hist[i] = {x: idx, hist: h} if h.date.isSame(moment priceData[idx][0])
+            idx++
+        console.error "signal date problem" if idx >= priceData.length
+
+        @set('signalHist', hist)
+
+
+        # @set('signalHist', signals.reverse())
 
   recentSignalURL: ->
     "http://boiling-ravine-9635.herokuapp.com/daily_signal/get/#{@stkCode()}"
@@ -120,7 +136,22 @@ module.exports = class PriceService extends Backbone.Model
           good = signal[3] == 'img/Check.gif'
           ret = parseFloat(signal[4].replace ',', '')
           [d.toString(), p, buySell, good, ret]
-        @set('signalHist', signals.reverse())
+
+        hist = for sh in signals.reverse() # date, price, B/S, flag, culmulative return
+          {date: new Date(sh[0]), price: sh[1], buySell: sh[2], flag: sh[3], cRet: sh[4]}
+
+        priceData = @getPriceData()
+        idx = 0
+        for h, i in hist # map the date to x-index in priceData's date
+          while idx < priceData.length and h.date >= new Date(priceData[idx].date)
+            # console.log " .... #{priceData[idx].date}"
+            hist[i] = {x: idx, hist: h} if moment(h.date).isSame(priceData[idx].date)
+            idx++
+        # console.log "TBD: signal history before filter #{hist.length}" 
+        # @signalHist = hist
+        # @priceGraph.drawSignals( hist.filter (h) -> h.x )
+
+        @set('signalHist', hist)
 
   fetchSignalHistJSONP: ->
     $.ajax 
