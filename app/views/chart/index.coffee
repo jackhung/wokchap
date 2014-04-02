@@ -29,16 +29,13 @@ module.exports = class ChartView extends View
 
     @volumeGraph = new VolumeGraph
       el: '#volume-graph'
+      model: @priceData
       xaxis: false
       zoomable: false
 
     @priceData.doFetch().then =>
       console.log ".............. fetched"
       @dataLength = @priceData.get("priceData").length
-      @candleGraph.onPriceData @priceData
-      @candleGraph.resetZoom()
-      @volumeGraph.onPriceData @priceData
-      @volumeGraph.resetZoom()
 
       @listenTo @priceData, "change", =>
         @candleGraph.resetZoom()
@@ -49,18 +46,16 @@ module.exports = class ChartView extends View
     @subscribeEvent 'zoomed', @zoomed
 
   listen: 
-    "change model" : "updateChart"
+    "change model" : "updateChart"    # realtime quote
     # "sync model" : "updateChart"
 
   updateChart: ->
-    attrs = @model.attributes
-    @priceData.addOrUpdateQuote attrs
-    # @candleGraph?.updateQuote attrs
-    # @volumeGraph?.updateQuote attrs
+    quote = @model.attributes
+    @priceData.addOrUpdateQuote quote
     now = moment().format("hh:mm")
-    f = d3.formatPrefix(attrs.volume)
-    vol = "#{f.scale(attrs.volume)}#{f.symbol}"
-    $("#page-head-cotainer").html "#{attrs.close} #{attrs.ask} #{attrs.bid}<br> #{vol} #{now}"
+    f = d3.formatPrefix(quote.volume)
+    vol = "#{f.scale(quote.volume)}#{f.symbol}"
+    $("#page-head-cotainer").html "#{quote.close} #{quote.ask} #{quote.bid}<br> #{vol} #{now}"
 
 
   zoomed: (domain) ->

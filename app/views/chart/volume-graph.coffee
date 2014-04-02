@@ -5,14 +5,17 @@ ChartView = require 'views/chart/base-chart'
 
 module.exports = class VolumeGraph extends ChartView
 
+  listen:
+    "change:priceData model" : "onPriceData"
+
   initialize: (options) ->
     super
     selected: null
 
   # Real Stock Data ==============================================================
   onPriceData: (priceData) =>
-    @model = priceData
-    @pData = priceData.get("priceData")
+    # @model = priceData
+    @pData = @model.get("priceData")
     # x-scale
     @x = d3.scale.linear()
         .domain([0, @pData.length])

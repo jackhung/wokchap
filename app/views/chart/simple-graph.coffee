@@ -15,12 +15,13 @@ module.exports = class SimpleGraph extends ChartView
     selected: null
 
   listen:
+    "change:priceData model" : "onPriceData"
     "change:signalHist model" : "drawSignals"
 
   # Real Stock Data ==============================================================
   onPriceData: (priceData) =>
-    @model = priceData
-    @pData = priceData.get("priceData")
+    # @model = priceData
+    @pData = @model.get("priceData")
     # x-scale
     @x = d3.scale.linear()
         .domain([0, @pData.length])
