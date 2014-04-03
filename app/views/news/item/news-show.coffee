@@ -11,13 +11,12 @@ module.exports = class NewsShowView extends View
   container: '#content-container'
   template: require('./show')
 
-  initialize: ->
-    # console.debug "NewsView#initialize ...", @model
-    super
-
   listen: 
     "change model" : "render"
     "mouseover .stock-tip" : 'showTip'
+
+  events:
+    "click .stock-ref" : "openChart"
 
   render: ->
     super
@@ -25,15 +24,10 @@ module.exports = class NewsShowView extends View
       $this = $(@)
       code = $this.attr("ref")
       $(" <i class='cus-chart-line stock-tip' ref='#{code}'></i> ").insertAfter($this)
-      console.debug $this.attr("ref")
 
-    # @$el.find(".stock-ref").on "click", () ->
-    #   $this = $(@)
-    #   code = $this.attr("ref")
-    #   utils.redirectTo 'chart#show', {code: code}
+    @initTip()  # see ViewHelper
 
-    @delegate 'click', '.stock-ref', (e) ->
-      $this = $(e.target)
-      code = $this.attr("ref")
-      utils.redirectTo 'chart#show', {code: code}
-    @initTip()
+  openChart: (e) ->
+    $this = $(e.target)
+    code = $this.attr("ref")
+    utils.redirectTo 'chart#show', {code: code}

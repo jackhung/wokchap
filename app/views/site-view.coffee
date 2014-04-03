@@ -11,6 +11,8 @@ module.exports = class ThreePaneView extends View
     header: '#header-container'
     content: '#content'
     footer: '#footer-container'
+
+    pageHeader: "#page-head-cotainer"
   template: template
 # module.exports = class SiteView extends View
 #   className: 'site-view'

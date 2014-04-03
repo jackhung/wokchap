@@ -3,7 +3,6 @@
 View = require('views/base/view')
 SimpleGraph = require "views/chart/simple-graph"
 VolumeGraph = require "views/chart/volume-graph"
-# SimpleGraphOrig = require "views/chart/js-simple-graph"
 PriceData = require "views/chart/stock-price-service"
 
 module.exports = class ChartView extends View

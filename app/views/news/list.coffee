@@ -16,11 +16,9 @@ module.exports = class NewsListView extends CollectionView
     pagerContent: "#pagination-container"
 
   initialize: ->
-    # console.log "NewsView#initialize ... #{@collection}"
     super
     pagerView = new PagerView model: @collection.pager, autoRender: false
     @subview "pagerView", pagerView
-
 
   # listen: 
   #   "change collection" : "render"
@@ -29,12 +27,8 @@ module.exports = class NewsListView extends CollectionView
     # console.log "NewsListView#initItemView ... #{item.get('title')}"
     new NewsView model: item
 
-  # getView: (item) ->
-  #   # Instantiate an item view
-  #   new NewsView model: item
-
-  render: ->
-    super
-    @subview("pagerView").render()
+  # render: ->
+  #   super
+  #   # @subview("pagerView").render()
 
 
