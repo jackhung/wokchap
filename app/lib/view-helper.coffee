@@ -59,6 +59,11 @@ ViewHelper =
 
   formatVol: (v) ->
     f = d3.formatPrefix(v)
-    "#{f.scale(v).toFixed(2)}#{f.symbol}"
+    "#{f.scale(v).toFixed(3)}#{f.symbol}"
+
+  formatChange: (c, p) ->
+    d = c - p
+    prct = (d / p * 100).toFixed(2)
+    "<span #{if d < 0 then 'class="price-down"'}>#{d.toFixed(3)} #{prct}%</span>"
 
 module.exports = ViewHelper

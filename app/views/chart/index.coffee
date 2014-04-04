@@ -69,6 +69,13 @@ module.exports = class ChartView extends View
       domain[1] = @dataLength
     v.zoomHandler? domain for v in @subviews
 
+  # Tab handling
+  tabHandler: ->
+    # $('a[data-toggle="tab"]').on 'shown.bs.tab', (e) =>
+    #   e.target // activated tab
+    #   e.relatedTarget // previous tab
+
+
   dispose: ->
     console.log "ChartView#dispose"
     # @priceData = null

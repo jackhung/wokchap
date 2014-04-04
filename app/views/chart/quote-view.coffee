@@ -7,8 +7,11 @@ module.exports = class QuoteView extends View
 
   listen:
     "change model" : "render"
+    "sync model" : "fetching"
+
+  fetching: ->
+    @$("#quote-pane").removeClass("highlight")
 
   render: ->
     super
-    console.log "QuoteView#render"
-    
+    @$("#quote-pane").addClass("highlight")

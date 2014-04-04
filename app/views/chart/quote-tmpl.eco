@@ -1,4 +1,10 @@
-<span ><%= @vh.formatVol @volume %></span>
+<% if @cName or @synced: %>
+<div id="quote-pane" class="highlight">
+<span><%= @close %> (<%= @ask %>/<%= @bid %>) <%= moment().format("hh:mm") %></span>
+<%- @vh.formatChange @close, @previousClose %>
 <br>
-<span>@cName</span>
-<span><%= @code %></span>
+<span ><%= @vh.formatVol @volume %></span>
+<% else: %>
+Not<br>Ready
+</div>
+<% end %>

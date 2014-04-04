@@ -59,6 +59,9 @@
 	  </div><!-- /.container-fluid -->
 	</nav>
 </div>
+<div id="spinner-widget">
+	<i class="fa fa-refresh fa-spin"></i>
+</div>
 <div id="content-container">
 	loading page ... 
 </div>

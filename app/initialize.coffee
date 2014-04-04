@@ -26,11 +26,16 @@ initialize = ->
   # adjust context path for the Application (hack for backend integrated deployment)
   rpath = config.contextRoot
   matchContext = new RegExp("^#{rpath}/|^#{rpath}$")
-  window.CHAP_APP = if matchContext.test(location.pathname)
+  window.WokApp = if matchContext.test(location.pathname)
       new App
        root: config.contextRoot
     else
       new App
+
+  $(document).ajaxStart ->
+    $("#spinner-widget").fadeIn()
+  $(document).ajaxStop ->
+    $("#spinner-widget").fadeOut()
 
 # Initialize the application on DOM ready event.
 # Use jQuery if available. Otherwise use native.

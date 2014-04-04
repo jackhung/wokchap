@@ -14,7 +14,9 @@
     "rivets": "~0.6.4",
     "moment": "2.5.1",
     "bootstrap": "~3.1.1",
-    "d3": "3.4.3"
+    "d3": "3.4.3",
+    "components-font-awesome": "~4.0.3",
+    "d3-tip": "~0.6.4"
   },
   "overrides": {
     "backbone": {

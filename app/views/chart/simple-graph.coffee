@@ -113,6 +113,10 @@ module.exports = class SimpleGraph extends ChartView
     @vis.select("svg").selectAll(".candle .candle-body")
 
   drawCandle: ->
+    unless @tip
+      @tip = d3.tip().attr('class', 'd3-tip').html((d) -> "price: " + d[4])
+      @vis.call @tip
+
     candle = @vis.select("svg").selectAll(".candle").data(@pData)
 
     group = candle.enter().append("g") .attr("class", "candle")
@@ -122,6 +126,8 @@ module.exports = class SimpleGraph extends ChartView
       .attr("class", (d) => if d[@POPEN] > d[@PCLOSE] then "stem bottom price-down" else "stem bottom price-up")
     group.append("svg:rect")
       .attr("class", (d) => if d[@POPEN] > d[@PCLOSE] then "candle-body price-down" else "candle-body price-up")
+      # .on('mouseover', @tip.show)
+      # .on('mouseout', @tip.hide)
 
     @allCandleStems("top") .attr("x1", 0).attr("y1", (d) => @y d[@PHIGH])
       .attr("x2", 0).attr("y2", (d) => @y(Math.max d[@POPEN], d[@PCLOSE]))
@@ -155,10 +161,11 @@ module.exports = class SimpleGraph extends ChartView
         @$hitX?.classed "hit", false
         @$hitX = $candle
         $candle.classed "hit", true
-        console.log @pData[x]
+        @tip.show(@pData[x], $candle)
     else
       @$hitX?.classed "hit", false
       @$hitX = null
+      @tip.hide()
 
   keydown: () =>
     return if not @selected

@@ -17,13 +17,9 @@ module.exports = class ThreePaneView extends View
     pageHeader2: "#page-head-container-r1"
     pageHeader3: "#page-head-container-r2"
   template: template
-# module.exports = class SiteView extends View
-#   className: 'site-view'
-#   # container: '#content-container'
-#   container: "body"
-#   template: require('./site')
 
 
-#   initialize: ->
-#     console.log "SiteView@initialize"
-#     super
+
+
+
+

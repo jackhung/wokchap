@@ -1,6 +1,4 @@
 
-<div id='stock-info' code='<%= @code %>' >
-</div> 
 <div id='chart-container' class='row'>
 	<div id='candle-graph' class='chart col-md-11'>
 	</div>
@@ -11,4 +9,23 @@
 	</div>
 	<div id="rtquote-panel"></div>
 
+</div>
+
+<div class='row'>
+	<ul class="nav nav-tabs">
+	  <li class="active"><a href="#tab-detail" data-toggle="tab">Detail</a></li>
+	  <li><a href="#tab-charts" data-toggle="tab">More Charts</a></li>
+	  <li><a href="#tab-news" data-toggle="tab">News</a></li>
+	  <li><a href="#tab-tips" data-toggle="tab">Tips</a></li>
+	  <li><a href="#tab-industry" data-toggle="tab">Industry</a></li>
+	</ul>
+
+	<!-- Tab panes -->
+	<div class="tab-content">
+	  <div class="tab-pane active" id="tab-detail">Detail</div>
+	  <div class="tab-pane" id="tab-charts">More Charts</div>
+	  <div class="tab-pane" id="tab-news">News</div>
+	  <div class="tab-pane" id="tab-tips">Tips</div>
+	  <div class="tab-pane" id="tab-industry">Industry</div>
+	</div>
 </div>
