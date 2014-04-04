@@ -12,7 +12,10 @@ module.exports = class ThreePaneView extends View
     content: '#content'
     footer: '#footer-container'
 
-    pageHeader: "#page-head-cotainer"
+    pageHeader0: "#page-head-container-l1"
+    pageHeader1: "#page-head-container-l2"
+    pageHeader2: "#page-head-container-r1"
+    pageHeader3: "#page-head-container-r2"
   template: template
 # module.exports = class SiteView extends View
 #   className: 'site-view'

@@ -9,5 +9,6 @@
 	<div id='indicator-graph' class='chart col-md-11'>
 		Indicator
 	</div>
+	<div id="rtquote-panel"></div>
 
 </div>

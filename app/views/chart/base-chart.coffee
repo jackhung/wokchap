@@ -9,7 +9,7 @@ View = require 'views/base/view'
     * mouseup : handle mouseup.drag and touchend.drag
 ###
 module.exports = class BaseChart extends View
-
+  # autoRender: false
   PDATE: 0
   POPEN: 1
   PHIGH: 2
@@ -19,6 +19,9 @@ module.exports = class BaseChart extends View
 
   defaults:
     xaxis: true
+
+  listen:
+    "change:priceData model" : "onPriceDataChanged"
 
   initialize: (options)->
     super
@@ -239,3 +242,25 @@ module.exports = class BaseChart extends View
       
       d3.event.preventDefault();
       d3.event.stopPropagation();
+
+  onPriceDataReady: ->
+    @pData = @model.get("priceData")
+    @rememberedDataSize = @pData.length
+
+  onPriceDataChanged: ->
+    if @checkDataSizeChanged()
+      @resetZoom() # @renderAxis()
+    else
+      @updateChart()
+
+  checkDataSizeChanged: ->
+    if @pData.length isnt @rememberedDataSize
+      @publishEvent "dataSizeChanged" 
+      @rememberedDataSize = @pData.length
+      true
+    else
+      false
+
+  render: ->
+    super
+    console.log "BaseChart#render"

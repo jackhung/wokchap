@@ -57,4 +57,8 @@ ViewHelper =
         $box.find(".rtq-change").html("#{change} #{percent}%").addClass(if (change[0] is '-') then "price-down" else "price-up")
         $box.find(".rtq-price").html("#{v_data[35]}")
 
+  formatVol: (v) ->
+    f = d3.formatPrefix(v)
+    "#{f.scale(v).toFixed(2)}#{f.symbol}"
+
 module.exports = ViewHelper

@@ -35,8 +35,8 @@
 	        </div>
 	        <button type="submit" class="btn btn-default">Submit</button>
 	      </form> -->
-	      <div id="page-head-cotainer" class="navbar-text panel panel-default">
-	      </div>
+	      <div id="page-head-container-l1" class="navbar-text panel panel-default"></div>
+	      <div id="page-head-container-l2" class="navbar-text panel panel-default"></div>
 	      <ul class="nav navbar-nav navbar-right">
 	      	<li><a href="chart/00712">Chart</a></li>
 	        <li><a href="book/00712">00712</a></li>
@@ -52,7 +52,10 @@
 	          </ul>
 	        </li>
 	      </ul>
+	      <div id="page-head-container-r1" class="pull-right navbar-text panel panel-default "></div>
+	      <div id="page-head-container-r2" class="pull-right navbar-text panel panel-default"></div>
 	    </div><!-- /.navbar-collapse -->
+
 	  </div><!-- /.container-fluid -->
 	</nav>
 </div>

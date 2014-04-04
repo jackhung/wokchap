@@ -1,0 +1,4 @@
+<span ><%= @vh.formatVol @volume %></span>
+<br>
+<span>@cName</span>
+<span><%= @code %></span>

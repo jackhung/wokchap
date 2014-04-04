@@ -15,13 +15,11 @@ module.exports = class SimpleGraph extends ChartView
     selected: null
 
   listen:
-    "change:priceData model" : "onPriceData"
     "change:signalHist model" : "drawSignals"
 
   # Real Stock Data ==============================================================
-  onPriceData: (priceData) =>
-    # @model = priceData
-    @pData = @model.get("priceData")
+  onPriceDataReady: () =>
+    super
     # x-scale
     @x = d3.scale.linear()
         .domain([0, @pData.length])
@@ -157,6 +155,7 @@ module.exports = class SimpleGraph extends ChartView
         @$hitX?.classed "hit", false
         @$hitX = $candle
         $candle.classed "hit", true
+        console.log @pData[x]
     else
       @$hitX?.classed "hit", false
       @$hitX = null

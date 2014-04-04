@@ -1,6 +1,6 @@
 'use strict'
 
-require('lib/view-helper')
+ViewHelper = require('lib/view-helper')
 
 module.exports = class View extends Chaplin.View
   autoRender: yes
@@ -21,3 +21,10 @@ module.exports = class View extends Chaplin.View
     @_rivets?.unbind()
     delete @_rivets
     super
+
+  getTemplateData: ->
+    data = super()
+    data.vh = ViewHelper
+    data
+
+  vh: ViewHelper
