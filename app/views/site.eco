@@ -42,13 +42,11 @@
 	        <li><a href="book/00712">00712</a></li>
 	        <li><a href="book/00566">00566</a></li>
 	        <li class="dropdown">
-	          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+	          <a id="app-username" href="#" class="dropdown-toggle" data-toggle="dropdown"> User <b class="caret"></b></a>
 	          <ul class="dropdown-menu">
-	            <li><a href="/signin">Login In</a></li>
+	            <li id='app-signin'><a href="/signin">Login In</a></li>
+	            <li id='app-signout'><a href="/signout"> Logout</a></li>
 	            <li><a href="/myAccount">My Account</a></li>
-	            <li><a href="#">Something else here</a></li>
-	            <li class="divider"></li>
-	            <li><a href="#">Separated link</a></li>
 	          </ul>
 	        </li>
 	      </ul>
