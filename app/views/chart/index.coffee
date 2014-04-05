@@ -69,8 +69,21 @@ module.exports = class ChartView extends View
       domain[1] = @dataLength
     v.zoomHandler? domain for v in @subviews
 
+
+  render: ->
+    super
+    @watchTabs()
+
+  watchTabs: ->
+    $tabs = @$(".nav-tabs li a")
+    console.debug "Tabs: ", $tabs
+    $tabs.on "show.bs.tab", @tabHandler
   # Tab handling
-  tabHandler: ->
+
+  tabHandler: (e) =>
+    $tab = @$(e.target)
+    # e.relatedTarget
+    console.log "#{$tab.attr('href')}"
     # $('a[data-toggle="tab"]').on 'shown.bs.tab', (e) =>
     #   e.target // activated tab
     #   e.relatedTarget // previous tab

@@ -64,6 +64,6 @@ ViewHelper =
   formatChange: (c, p) ->
     d = c - p
     prct = (d / p * 100).toFixed(2)
-    "<span #{if d < 0 then 'class="price-down"'}>#{d.toFixed(3)} #{prct}%</span>"
+    "<span #{if d < 0 then 'class="price-down"' else ''}>#{d.toFixed(3)} #{prct}%</span>"
 
 module.exports = ViewHelper
