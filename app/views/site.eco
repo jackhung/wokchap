@@ -35,7 +35,7 @@
 	        </div>
 	        <button type="submit" class="btn btn-default">Submit</button>
 	      </form> -->
-	      <div id="page-head-container-l1" class="navbar-text panel panel-default"></div>
+	      <div id="page-head-container-l1" class="navbar-text panel-default"></div>
 	      <div id="page-head-container-l2" class="navbar-text panel panel-default"></div>
 	      <ul class="nav navbar-nav navbar-right">
 	      	<li><a href="chart/00712">Chart</a></li>

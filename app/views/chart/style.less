@@ -36,14 +36,14 @@ rect.candle-box {
   fill: #BBF;
   opacity: 0.6;
 }
-rect.volume-bar {
+rect.volume-bar, rect.macd-bar {
 	stroke: #88F;
 	fill: #88F;
 }
-rect.candle-box.down, rect.volume-bar.down {
+rect.candle-box.down, rect.volume-bar.down, rect.macd-bar.down {
   stroke: #F88;
 }
-rect.volume-bar.down {
+rect.volume-bar.down, rect.macd-bar.down {
 	fill: #F88;
 }
 
@@ -89,4 +89,34 @@ circle.selected:hover {
 .signal.buy {
 	fill: #8f8;
 	stroke: #0A0;
+}
+
+.chart-line {
+  stroke-width: 1;
+  opacity: 0.6;
+  fill: none;
+  shape-rendering: crispEdges;
+  &.bolMA {
+    stroke: #4AA;
+    // fill: #d00;
+  }
+  &.bolUP, &.bolLO {
+    stroke: #880;
+  }
+}
+.chart-line.sma10 {
+  stroke: #088;
+}
+.chart-line.sma20 {
+  stroke: #808;
+}
+.chart-line.sma50 {
+  stroke: #880;
+}
+
+.chart-line.macd {
+  stroke: #088;
+}
+.chart-line.macds {
+  stroke: #800;
 }

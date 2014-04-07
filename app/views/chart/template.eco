@@ -2,10 +2,15 @@
 <div id='chart-container' class='row'>
 	<div id='candle-graph' class='chart col-md-11'>
 	</div>
+	<div id="chart-control-pane" class='col-md-1'>
+		<select id="price-overlay">
+			<option >Bollinger</option>
+			<option >SMA</option>
+		</select>
+	</div>
 	<div id='volume-graph' class='chart col-md-11'>
 	</div>
 	<div id='indicator-graph' class='chart col-md-11'>
-		Indicator
 	</div>
 	<div id="rtquote-panel"></div>
 
@@ -29,3 +34,4 @@
 	  <div class="tab-pane" id="tab-industry">Industry</div>
 	</div>
 </div>
+<div id="stock-cookies" class="row"><div class="cookie-list"></div></div>

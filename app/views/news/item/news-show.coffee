@@ -20,12 +20,13 @@ module.exports = class NewsShowView extends View
 
   render: ->
     super
-    @$el.find(".stock-ref").each (ref) ->
-      $this = $(@)
-      code = $this.attr("ref")
-      $(" <i class='cus-chart-line stock-tip' ref='#{code}'></i> ").insertAfter($this)
+    # @$el.find(".stock-ref").each (ref) ->
+    #   $this = $(@)
+    #   code = $this.attr("ref")
+    #   $(" <i class='cus-chart-line stock-tip' ref='#{code}'></i> ").insertAfter($this)
 
-    @initTip()  # see ViewHelper
+    # @initTip()  # see ViewHelper
+    @initStockRef @$el.find(".stock-ref")
 
   openChart: (e) ->
     $this = $(e.target)

@@ -3,6 +3,7 @@
 ChartOptions = require 'views/chart/chart-options'
 # PriceService = require 'views/chart/stock-price-service'
 ChartView = require 'views/chart/base-chart'
+Bollinger = require 'views/chart/bollinger'
 
 module.exports = class SimpleGraph extends ChartView
 
@@ -13,6 +14,9 @@ module.exports = class SimpleGraph extends ChartView
 
     dragged: null
     selected: null
+
+    # @delegate "change", "#price-overlay", @overlayChanged
+    $("#price-overlay").on "change", @overlayChanged
 
   listen:
     "change:signalHist model" : "drawSignals"
@@ -35,6 +39,7 @@ module.exports = class SimpleGraph extends ChartView
 
     # @initChartElements()
     @renderAxis()
+    @bollinger = new Bollinger().calculate(@pData)
 
   # ===============================================================================
 
@@ -45,6 +50,28 @@ module.exports = class SimpleGraph extends ChartView
   updateChart: () =>
     @drawCandle()
     @drawSignals()
+    @drawOverlay()
+
+  drawOverlay: ->
+    switch $("#price-overlay").val()
+      when "Bollinger"
+        @drawBollinger()
+      when "SMA"
+        @drawSMA()
+
+  overlayChanged: =>
+    d3.selectAll(".chart-line").remove()
+    @drawOverlay()
+
+  drawBollinger: ->
+    for bol, data of @bollinger
+      @drawLine bol, data
+
+  drawSMA: ->
+    techs = @model.get "technicals"
+    for sma in ["sma10", "sma20", "sma50"]
+      data = techs[sma]
+      @drawLine sma, data
 
   drawCircle: ->          
     circle = @vis.select("svg").selectAll(".datapoint")
@@ -161,7 +188,10 @@ module.exports = class SimpleGraph extends ChartView
         @$hitX?.classed "hit", false
         @$hitX = $candle
         $candle.classed "hit", true
-        @tip.show(@pData[x], $candle)
+        try
+          @tip.show(@pData[x], $candle) if x >= 0 and x < @pData.length
+        catch e
+          console.debug "doHit Error:", x, $candle
     else
       @$hitX?.classed "hit", false
       @$hitX = null
@@ -209,6 +239,10 @@ module.exports = class SimpleGraph extends ChartView
       yhigh = d[@PHIGH] if d[@PHIGH] > yhigh
 
     [yhigh, ylow ] # NOTE: inverted order max, min!
+
+  dispose: () ->
+    super
+    $(".d3-tip").remove()
 
 registerKeyboardHandler = (callback) ->
   callback = callback

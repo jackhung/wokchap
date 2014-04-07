@@ -1,4 +1,4 @@
-<% if @cName or @synced: %>
+<% if @cName : %>
 <div id="quote-pane" class="highlight">
 <span><%= @close %> (<%= @ask %>/<%= @bid %>) <%= moment().format("hh:mm") %></span>
 <%- @vh.formatChange @close, @previousClose %>

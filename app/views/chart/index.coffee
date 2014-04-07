@@ -2,9 +2,13 @@
 
 View = require('views/base/view')
 SimpleGraph = require "views/chart/simple-graph"
-VolumeGraph = require "views/chart/volume-graph"
+VolumeGraph = require "views/chart/subcharts/volume-graph"
+MacdGraph = require "views/chart/subcharts/macd-graph"
 PriceData = require "views/chart/stock-price-service"
 QuoteView = require 'views/chart/quote-view'
+StockInfoView = require 'views/chart/stock-info-view'
+
+CookieView = require 'views/chart/components/stock-cookie-view'
 
 module.exports = class ChartView extends View
   className: 'chart-view'
@@ -40,9 +44,24 @@ module.exports = class ChartView extends View
       zoomable: false
     @subview "volumeGraph", volumeGraph
 
+    macdGraph = new MacdGraph
+      el: '#indicator-graph'
+      model: @priceData
+      xaxis: false
+      zoomable: false
+    @subview "macdGraph", macdGraph
+
     quoteView = new QuoteView
       model: @model
     @subview "quoteView", quoteView
+
+    stockInfoView = new StockInfoView
+      model: @priceData
+    @subview "stockInfoView", stockInfoView
+
+    cookieView = new CookieView
+      model: @priceData
+    @subview "cookieView", cookieView
 
     v.onPriceDataReady?() for v in @subviews
     v.resetZoom?() for v in @subviews

@@ -19,6 +19,7 @@ module.exports = class BaseChart extends View
 
   defaults:
     xaxis: true
+    yticks: 8
 
   listen:
     "change:priceData model" : "onPriceDataChanged"
@@ -108,6 +109,18 @@ module.exports = class BaseChart extends View
         .on("mouseup.drag",   @mouseup)
         .on("touchend.drag",  @mouseup)
 
+  drawLine: (name, data) =>
+    @chartLines = {} unless @chartLines
+    line = d3.svg.line()
+        .defined((d, i) -> not d = null and not isNaN(d) )
+        .x((d, i) => return @x(i))
+        .y((d) => return if isNaN(d) then 0 else @y(d))
+    if not @chartLines[name]
+      @chartLines[name] = 
+        path: @bgPane.append("path").attr("class", "chart-line #{name}")
+        funct: line
+    @chartLines[name].path.attr("d", @chartLines[name].funct(data))
+
   renderAxis: () =>
     tx = (d) => "translate(#{@x(d)},0)"
     ty = (d) => "translate(0,#{@y(d)})"
@@ -136,7 +149,7 @@ module.exports = class BaseChart extends View
     gx.exit().remove();
 
     # Regenerate y-ticks…
-    gy = @bgPane.selectAll("g.y") .data(@y.ticks(8), String) .attr("transform", ty)
+    gy = @bgPane.selectAll("g.y") .data(@y.ticks(@options.yticks), String) .attr("transform", ty)
     # gy.select("text") .text(fy)
     gye = gy.enter().insert("g", "a") .attr("class", "y") .attr("transform", ty) .attr("background-fill", "#FFEEB6")
     gye.append("line") .attr("stroke", stroke) .attr("x1", 0) .attr("x2", @size.width)

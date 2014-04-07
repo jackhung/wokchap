@@ -3,8 +3,17 @@
 utils = require('./utils')
 
 ViewHelper = 
+  initStockRef: (elems) ->
+    elems.each (ref) ->
+      $this = $(@)
+      code = $this.attr("ref")
+      $(" <i class='cus-chart-line stock-tip' ref='#{code}'></i> ").insertAfter($this)
+
+    @initTip()  # see ViewHelper
+
   initTip: () ->
     self = @
+    @$el.off "shown.bs.popover", ".stock-tip"
     @$el.find(".stock-tip").each (e) ->
       $this = $(@)
       stkCode = $this.attr("ref")
@@ -17,14 +26,14 @@ ViewHelper =
         content: -> self.tipPopoverContent(stkCode)
         # selector: "#stk-tip-content-container"
 
-    @delegate "shown.bs.popover", ".stock-tip", @showTip    
+    @delegate "shown.bs.popover", ".stock-tip", @showTip
 
   showTip: (e) ->
     $elm = $(e.target)
     stkCode = $elm.attr("ref")
 
     @fetchLatestQuote stkCode
-    console.debug stkCode
+    console.debug "ViewHelper#showTip", stkCode
 
   tipPopoverContent: (stkCode) ->
     img = "<img class='rtq_chart_png' src='http://img.finance.qq.com/images/hq_parts_little4/hongkong/#{stkCode}.png'/>"
@@ -65,5 +74,10 @@ ViewHelper =
     d = c - p
     prct = (d / p * 100).toFixed(2)
     "<span #{if d < 0 then 'class="price-down"' else ''}>#{d.toFixed(3)} #{prct}%</span>"
+
+  openChart: (e) ->
+    $this = $(e.target)
+    code = $this.attr("ref")
+    utils.redirectTo 'chart#show', {code: code}
 
 module.exports = ViewHelper

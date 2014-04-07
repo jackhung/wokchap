@@ -4,10 +4,11 @@ ChartOptions = require 'views/chart/chart-options'
 ChartView = require 'views/chart/base-chart'
 
 module.exports = class VolumeGraph extends ChartView
+  defaults:
+    yticks: 5
 
   initialize: (options) ->
     super
-    selected: null
 
   # Real Stock Data ==============================================================
   onPriceDataReady: () =>

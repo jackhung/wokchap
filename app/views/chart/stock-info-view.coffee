@@ -1,13 +1,13 @@
 View = require 'views/base/view'
-QuoteTmpl = require 'views/chart/quote-tmpl'
+template = require 'views/chart/stock-info'
 
-module.exports = class QuoteView extends View
-  region: "pageHeader3"
-  template: QuoteTmpl
+module.exports = class StockInfoView extends View
+  region: "pageHeader0"
+  template: template
 
   listen:
     "change model" : "render"
-    "request model" : "fetching"
+    "sync model" : "fetching"
 
   fetching: ->
     @$("#quote-pane").removeClass("highlight")
